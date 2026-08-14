@@ -1663,6 +1663,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
       <div class="nb" onclick="dnP('post',this)"><div class="nb-i">🇨🇿</div><div class="nb-l">Post-Stay</div></div>
       <div class="nb" onclick="dnP('travel',this)"><div class="nb-i">✈️</div><div class="nb-l">Travel Plan</div></div>
       <div class="nb" onclick="dnP('points',this)"><div class="nb-i">💳</div><div class="nb-l">Points Strategy</div></div>
+      <div class="nb" onclick="dnP('questions',this)"><div class="nb-i">❓</div><div class="nb-l">Questions</div></div>
       <div class="nb" onclick="dnP('dining',this)"><div class="nb-i">🍽</div><div class="nb-l">Reservations</div></div>
       <div class="nb" onclick="dnP('excursions',this)"><div class="nb-i">🏛</div><div class="nb-l">Excursions</div></div>
       <div class="nb" onclick="dnP('outfits',this)"><div class="nb-i">👗</div><div class="nb-l">Outfits</div></div>
@@ -2114,6 +2115,13 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
       </div></div>
     </div>
 
+    <div class="panel" id="dn-questions">
+      <div class="sec"><div class="sh"><div class="st">❓ Open Questions</div><button class="sa" onclick="openAddQuestion('dn')">+ Add</button></div>
+        <div style="font-size:11.5px;color:var(--ts);margin:0 0 12px;line-height:1.5">Running list of things to nail down before we go — grouped by who can actually answer them. Check one off once it's settled.</div>
+        <div id="dn-questions-list"></div>
+      </div>
+    </div>
+
     <div class="panel" id="dn-docs">
       <div class="sec"><div class="dg">
         <div class="dc"><div class="di2">🛂</div><div class="dn2">Larra Passport</div><div class="dnum">A75543260 ✓</div></div>
@@ -2513,6 +2521,7 @@ function fbRefreshAllSyncedUI() {
   try { renderFightCard(); } catch (e) {}
   try { renderPointsTracker(); } catch (e) {}
   try { renderPointsTodos(); } catch (e) {}
+  try { renderQuestions('dn'); } catch (e) {}
   try {
     ['lv', 'ak', 'dn'].forEach(function (trip) {
       renderUnifiedDining(trip);
@@ -2819,6 +2828,30 @@ function lvdRemovePhoto(ns, idx) {
   var refreshFn = lvdPhotoRefreshers[ns];
   if (refreshFn) refreshFn();
 }
+function lvdCompressImage(dataUrl, cb) {
+  // Downscale + re-encode as JPEG so photos take a fraction of the raw camera-file size,
+  // which is what was blowing through localStorage's quota on-device.
+  try {
+    var img = new Image();
+    img.onload = function() {
+      var maxDim = 1000;
+      var w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w >= h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+        else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var out;
+      try { out = canvas.toDataURL('image/jpeg', 0.72); } catch(e) { out = dataUrl; }
+      cb(out || dataUrl);
+    };
+    img.onerror = function() { cb(dataUrl); };
+    img.src = dataUrl;
+  } catch(e) { cb(dataUrl); }
+}
 function lvdAddPhotos(ns, files, cb) {
   if (!files || !files.length) { if (cb) cb(); return; }
   var photos = lvdPhotos(ns);
@@ -2826,9 +2859,11 @@ function lvdAddPhotos(ns, files, cb) {
   Array.from(files).forEach(function(f) {
     var r = new FileReader();
     r.onload = function(e) {
-      photos.push(e.target.result);
-      remaining--;
-      if (remaining === 0) { lvdSet('lvd_photos_' + ns, photos); if (cb) cb(); }
+      lvdCompressImage(e.target.result, function(compressed) {
+        photos.push(compressed);
+        remaining--;
+        if (remaining === 0) { lvdSet('lvd_photos_' + ns, photos); if (cb) cb(); }
+      });
     };
     r.readAsDataURL(f);
   });
@@ -3039,9 +3074,13 @@ function renderPeopleList(trip) {
     var avatarInner = photos.length
       ? '<img src="' + photos[0] + '" style="width:38px;height:38px;object-fit:cover;border-radius:50%">'
       : '<div class="pav">' + p.init + '</div>';
-    var avatar = '<div style="cursor:pointer" title="Tap to add/change photo" onclick="lvdQuickAddPhoto(\'' + ns + '\',\'personwrap-' + ns + '\',true)" id="personwrap-' + ns + '">' + avatarInner + '</div>';
-    return '<div class="pc">' + avatar + '<div style="flex:1"><div class="pr">' + (p.role || 'Guest') + '</div><div class="pname">' + p.name + '</div>'
-      + (p.notes ? '<div class="pnotes">' + p.notes + '</div>' : '') + '</div><div>' + (p.star && p.star.indexOf('Yes') > -1 ? '⭐' : '') + '</div></div>';
+    var avatar = '<div style="cursor:pointer" title="Tap to add/change photo" onclick="event.stopPropagation();lvdQuickAddPhoto(\'' + ns + '\',\'personwrap-' + ns + '\',true)" id="personwrap-' + ns + '">' + avatarInner + '</div>';
+    var actions = '<div style="display:flex;gap:6px;align-items:center">'
+      + '<div title="Edit" onclick="event.stopPropagation();openEditPerson(\'' + trip + '\',\'' + p.id + '\')" style="cursor:pointer;font-size:14px;padding:2px">\u270f\ufe0f</div>'
+      + '<div title="Delete" onclick="event.stopPropagation();deletePerson(\'' + trip + '\',\'' + p.id + '\')" style="cursor:pointer;font-size:14px;padding:2px;color:#dc2626">\ud83d\uddd1\ufe0f</div>'
+      + '</div>';
+    return '<div class="pc" style="cursor:pointer" onclick="openEditPerson(\'' + trip + '\',\'' + p.id + '\')">' + avatar + '<div style="flex:1"><div class="pr">' + (p.role || 'Guest') + '</div><div class="pname">' + p.name + '</div>'
+      + (p.notes ? '<div class="pnotes">' + p.notes + '</div>' : '') + '</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + (p.star && p.star.indexOf('Yes') > -1 ? '<div>⭐</div>' : '<div></div>') + actions + '</div></div>';
   }).join('');
 }
 
@@ -3864,6 +3903,7 @@ function saveUnifiedReservation(isEdit) {
   syncMealStatusFromRes(mTrip);
   renderUnifiedDining(mTrip);
   renderDiningCalendar(mTrip);
+  if (mTrip === 'ak' && typeof renderAllAkDayMeals === 'function') renderAllAkDayMeals();
 }
 function deleteUnifiedReservation(trip, resId) {
   if (!confirm('Delete this reservation?')) return;
@@ -3873,6 +3913,7 @@ function deleteUnifiedReservation(trip, resId) {
   renderUnifiedDining(trip);
   renderDiningCalendar(trip);
   renderItinDay(trip, itinState[trip]);
+  if (trip === 'ak' && typeof renderAllAkDayMeals === 'function') renderAllAkDayMeals();
 }
 function syncMealStatusFromRes(trip) {
   var days = ITIN_DATA[trip];
@@ -4104,6 +4145,90 @@ function savePointsEdit() {
   lvdSet('lvd_data_points_' + key, {balance: balance, notes: notes, updated: today});
   renderPointsTracker();
   closeModal();
+}
+
+// ── OPEN QUESTIONS TRACKER (grouped by who to ask) ──
+var QUESTION_CATEGORIES = ['Linnea (Travel Advisor)', 'Celebrity / Cruise Line', 'Budapest Hotel', 'Prague Hotel', 'Airline / Flights', 'Restaurant', 'Other'];
+function questionCatOptionsHtml(selected) {
+  return QUESTION_CATEGORIES.map(function(c) {
+    return '<option value="' + c + '"' + (c === selected ? ' selected' : '') + '>' + c + '</option>';
+  }).join('');
+}
+function openAddQuestion(trip) {
+  mType = 'question'; mTrip = trip; mTarget = null;
+  document.getElementById('m-title').textContent = 'Add Question';
+  document.getElementById('m-body').innerHTML = ''
+    + '<div class="mf"><label>Question</label><textarea id="f-q-text" placeholder="e.g. Can we get an early check-in at the Kempinski?"></textarea></div>'
+    + '<div class="mf"><label>Who to ask</label><select id="f-q-cat">' + questionCatOptionsHtml('Linnea (Travel Advisor)') + '<option value="__custom__">+ Type my own...</option></select></div>'
+    + '<div class="mf" id="f-q-cat-custom-wrap" style="display:none"><label>Custom</label><input id="f-q-cat-custom" placeholder="e.g. Delta Airlines"></div>'
+    + '<div class="mf"><label>Notes (optional)</label><input id="f-q-notes" placeholder="Context, deadline, etc."></div>';
+  var delBtn = document.getElementById('m-delete-btn');
+  if (delBtn) delBtn.style.display = 'none';
+  document.getElementById('overlay').classList.add('open');
+  var sel = document.getElementById('f-q-cat');
+  sel.onchange = function() {
+    document.getElementById('f-q-cat-custom-wrap').style.display = sel.value === '__custom__' ? '' : 'none';
+  };
+}
+function openEditQuestion(trip, qid) {
+  var list = lvdGet('lvd_questions_' + trip, []);
+  var q = list.find(function(x) { return x.id === qid; });
+  if (!q) return;
+  mType = 'question-edit'; mTrip = trip; mTarget = qid;
+  document.getElementById('m-title').textContent = 'Edit Question';
+  var isPreset = QUESTION_CATEGORIES.indexOf(q.category) > -1;
+  document.getElementById('m-body').innerHTML = ''
+    + '<div class="mf"><label>Question</label><textarea id="f-q-text">' + (q.text || '') + '</textarea></div>'
+    + '<div class="mf"><label>Who to ask</label><select id="f-q-cat">' + questionCatOptionsHtml(isPreset ? q.category : '') + '<option value="__custom__"' + (isPreset ? '' : ' selected') + '>+ Type my own...</option></select></div>'
+    + '<div class="mf" id="f-q-cat-custom-wrap" style="display:' + (isPreset ? 'none' : '') + '"><label>Custom</label><input id="f-q-cat-custom" value="' + (isPreset ? '' : (q.category || '').replace(/"/g, '&quot;')) + '"></div>'
+    + '<div class="mf"><label>Notes (optional)</label><input id="f-q-notes" value="' + (q.notes || '').replace(/"/g, '&quot;') + '"></div>'
+    + '<div class="mf"><label>Answer (once you hear back)</label><textarea id="f-q-answer" placeholder="What did they say?">' + (q.answer || '') + '</textarea></div>';
+  var delBtn = document.getElementById('m-delete-btn');
+  if (delBtn) delBtn.style.display = '';
+  document.getElementById('overlay').classList.add('open');
+  var sel = document.getElementById('f-q-cat');
+  sel.onchange = function() {
+    document.getElementById('f-q-cat-custom-wrap').style.display = sel.value === '__custom__' ? '' : 'none';
+  };
+}
+function toggleQuestionAnswered(trip, qid) {
+  var list = lvdGet('lvd_questions_' + trip, []);
+  var q = list.find(function(x) { return x.id === qid; });
+  if (q) q.answered = !q.answered;
+  lvdSet('lvd_questions_' + trip, list);
+  renderQuestions(trip);
+}
+function renderQuestions(trip) {
+  var wrap = document.getElementById(trip + '-questions-list');
+  if (!wrap) return;
+  var list = lvdGet('lvd_questions_' + trip, []);
+  if (!list.length) {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--tm);text-align:center;padding:14px">No questions yet — tap + Add above to start your list.</div>';
+    return;
+  }
+  var order = QUESTION_CATEGORIES.slice();
+  list.forEach(function(q) { if (order.indexOf(q.category) === -1) order.push(q.category); });
+  var html = '';
+  order.forEach(function(cat) {
+    var items = list.filter(function(q) { return q.category === cat; });
+    if (!items.length) return;
+    var openCount = items.filter(function(q) { return !q.answered; }).length;
+    items = items.slice().sort(function(a, b) { return (a.answered ? 1 : 0) - (b.answered ? 1 : 0); });
+    html += '<div style="font-size:10px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px">' + cat
+      + ' <span style="color:var(--tm);font-weight:600;text-transform:none">(' + (openCount ? openCount + ' open' : 'all answered') + ')</span></div>';
+    html += items.map(function(q) {
+      var doneStyle = q.answered ? 'text-decoration:line-through;color:var(--tm)' : '';
+      return '<div class="card" style="padding:10px 12px;margin-bottom:6px;cursor:pointer" onclick="openEditQuestion(\'' + trip + '\',\'' + q.id + '\')">'
+        + '<div style="display:flex;align-items:flex-start;gap:8px">'
+        + '<div onclick="event.stopPropagation();toggleQuestionAnswered(\'' + trip + '\',\'' + q.id + '\')" title="Mark answered" style="width:20px;height:20px;border-radius:6px;border:2px solid var(--bs);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;background:' + (q.answered ? 'var(--ac)' : 'transparent') + '">' + (q.answered ? '<span style="color:white;font-size:12px">✓</span>' : '') + '</div>'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:13px;font-weight:600;' + doneStyle + '">' + q.text + '</div>'
+        + (q.notes ? '<div style="font-size:11px;color:var(--ts);margin-top:2px">' + q.notes + '</div>' : '')
+        + (q.answered && q.answer ? '<div style="font-size:11.5px;color:#15803d;margin-top:4px;font-weight:600">✓ ' + q.answer + '</div>' : '')
+        + '</div></div></div>';
+    }).join('');
+  });
+  wrap.innerHTML = html;
 }
 
 function fightId(section, i) { return 'ufcfight_' + section + '_' + i; }
@@ -4467,6 +4592,19 @@ function renderWatchTab(){
 }
 
 function updateWatchClock(){
+  var navBtn = document.getElementById('ak-watch-nb');
+  var target = nextWatchTarget();
+  var isDone = !target.time;
+  if(navBtn){
+    var wasOn = navBtn.classList.contains('on');
+    navBtn.style.display = isDone ? 'none' : '';
+    if(isDone && wasOn){
+      // The countdown/reveal sequence is fully spent — nothing left to watch for.
+      // Bounce off this tab to the itinerary rather than leaving Eric stranded on a dead screen.
+      var itinBtn = document.querySelector('#ak-nav .nb[onclick*="itinerary"]');
+      akP('itinerary', itinBtn);
+    }
+  }
   var panel = document.getElementById('ak-watch');
   if(!panel || !panel.classList.contains('on')) return;
   var clockEl = document.getElementById('watch-clock');
@@ -4692,6 +4830,7 @@ window.onload = function() {
   restorePackingState();
   renderPointsTracker();
   renderPointsTodos();
+  renderQuestions('dn');
   fbPullAndListen();
   renderLetterTab();
   setInterval(checkLetterUnlocks, 30000);
@@ -4704,14 +4843,14 @@ window.onload = function() {
   renderConcierge('lv'); renderConcierge('ak'); renderConcierge('dn');
 };
 
-function saveKey(){
-  var inp=document.getElementById('ck-key-input');
+function saveKey(trip){
+  var inp=document.getElementById(trip+'-key-input');
   if(!inp)return;
   var v=inp.value.trim();
   if(!v){alert('Please paste your API key first');return;}
   apiKey=v;
   localStorage.setItem('lvd_api_key',apiKey);
-  ['lv','ak','dn'].forEach(function(t){ var b=document.getElementById(t+'-key-banner'); if(b) b.style.display='none'; var g=document.getElementById(t+'-key-active'); if(g) g.style.display=''; });
+  ['lv','ak','dn'].forEach(function(t){ var b=document.getElementById(t+'-key-banner'); if(b) b.style.display='none'; var g=document.getElementById(t+'-key-active'); if(g) g.style.display=''; var i=document.getElementById(t+'-key-input'); if(i) i.value=apiKey; });
 }
 function forgetKey(){
   if(!confirm('Remove the saved API key from this device?'))return;
@@ -5103,6 +5242,26 @@ function openAddPerson(trip){
   document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>See again?</label><select id="f-star"><option>Yes</option><option>Maybe</option><option>No</option></select></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
 }
+function openEditPerson(trip, pid){
+  var list = lvdGet('lvd_peoplelist_' + trip, []);
+  var p = list.find(function(x){ return x.id === pid; });
+  if (!p) return;
+  mType='person-edit'; mTrip=trip; mTarget=pid;
+  document.getElementById('m-title').textContent='Edit Person';
+  var starOpts = ['Yes','Maybe','No'].map(function(o){
+    return '<option' + (p.star===o?' selected':'') + '>' + o + '</option>';
+  }).join('');
+  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>See again?</label><select id="f-star">' + starOpts + '</select></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  document.getElementById('overlay').classList.add('open');
+}
+function deletePerson(trip, pid){
+  if (!confirm('Remove this person?')) return;
+  var list = lvdGet('lvd_peoplelist_' + trip, []);
+  list = list.filter(function(x){ return x.id !== pid; });
+  lvdSet('lvd_peoplelist_' + trip, list);
+  lvdSet('lvd_photos_person_' + trip + '_' + pid, []);
+  renderPeopleList(trip);
+}
 function openJ(el){
   mType='journal';mTarget=el;
   document.getElementById('m-title').textContent='Journal Entry';
@@ -5198,6 +5357,56 @@ function saveM(){
       lvdSet('lvd_peoplelist_'+mTrip, list);
       lvdAddPhotos('person_'+mTrip+'_'+pid, personFiles, function(){ renderPeopleList(mTrip); });
       renderPeopleList(mTrip);
+    }
+  } else if(mType==='person-edit'){
+    var peName=document.getElementById('f-name')?document.getElementById('f-name').value:'';
+    var peRole=document.getElementById('f-role')?document.getElementById('f-role').value:'';
+    var peNotes=document.getElementById('f-notes')?document.getElementById('f-notes').value:'';
+    var peStar=document.getElementById('f-star')?document.getElementById('f-star').value:'';
+    var pePhotoFiles=document.getElementById('f-person-photo')?document.getElementById('f-person-photo').files:null;
+    var peList=lvdGet('lvd_peoplelist_'+mTrip, []);
+    var peP=peList.find(function(x){ return x.id===mTarget; });
+    if(peP){
+      var peUseName=peName||peP.name||'Guest';
+      peP.name=peUseName;
+      peP.role=peRole;
+      peP.notes=peNotes;
+      peP.star=peStar;
+      peP.init=peUseName.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      lvdSet('lvd_peoplelist_'+mTrip, peList);
+      if(pePhotoFiles && pePhotoFiles.length){
+        // Replace existing photo(s) rather than piling on top of old ones.
+        lvdSet('lvd_photos_person_'+mTrip+'_'+mTarget, []);
+        lvdAddPhotos('person_'+mTrip+'_'+mTarget, pePhotoFiles, function(){ renderPeopleList(mTrip); });
+      }
+      renderPeopleList(mTrip);
+    }
+  } else if(mType==='question'){
+    var qText=document.getElementById('f-q-text')?document.getElementById('f-q-text').value.trim():'';
+    var qCatSel=document.getElementById('f-q-cat')?document.getElementById('f-q-cat').value:'';
+    var qCatCustom=document.getElementById('f-q-cat-custom')?document.getElementById('f-q-cat-custom').value.trim():'';
+    var qCategory = qCatSel==='__custom__' ? (qCatCustom||'Other') : qCatSel;
+    var qNotes=document.getElementById('f-q-notes')?document.getElementById('f-q-notes').value:'';
+    if(qText){
+      var qList=lvdGet('lvd_questions_'+mTrip, []);
+      qList.push({id:'q'+Date.now(), text:qText, category:qCategory, notes:qNotes, answer:'', answered:false});
+      lvdSet('lvd_questions_'+mTrip, qList);
+      renderQuestions(mTrip);
+    }
+  } else if(mType==='question-edit'){
+    var qeText=document.getElementById('f-q-text')?document.getElementById('f-q-text').value.trim():'';
+    var qeCatSel=document.getElementById('f-q-cat')?document.getElementById('f-q-cat').value:'';
+    var qeCatCustom=document.getElementById('f-q-cat-custom')?document.getElementById('f-q-cat-custom').value.trim():'';
+    var qeCategory = qeCatSel==='__custom__' ? (qeCatCustom||'Other') : qeCatSel;
+    var qeNotes=document.getElementById('f-q-notes')?document.getElementById('f-q-notes').value:'';
+    var qeAnswer=document.getElementById('f-q-answer')?document.getElementById('f-q-answer').value.trim():'';
+    var qeList=lvdGet('lvd_questions_'+mTrip, []);
+    var qeItem=qeList.find(function(x){ return x.id===mTarget; });
+    if(qeItem && qeText){
+      qeItem.text=qeText; qeItem.category=qeCategory; qeItem.notes=qeNotes; qeItem.answer=qeAnswer;
+      if(qeAnswer && !qeItem.answered) qeItem.answered=true;
+      lvdSet('lvd_questions_'+mTrip, qeList);
+      renderQuestions(mTrip);
     }
   } else if(mType==='restaurant'){
     var name=document.getElementById('f-name')?document.getElementById('f-name').value:'';
@@ -5309,6 +5518,14 @@ function saveM(){
   closeModal();
 }
 function deleteM(){
+  if(mType==='question-edit'&&mTarget){
+    var qdList=lvdGet('lvd_questions_'+mTrip, []);
+    qdList=qdList.filter(function(x){ return x.id!==mTarget; });
+    lvdSet('lvd_questions_'+mTrip, qdList);
+    renderQuestions(mTrip);
+    closeModal();
+    return;
+  }
   if(mType==='points-edit'&&window._pointsEditKey){
     try{localStorage.removeItem('lvd_data_points_'+window._pointsEditKey);}catch(e){}
     renderPointsTracker();
@@ -5367,8 +5584,8 @@ function renderConcierge(trip){
     +   '<div class="tip-lbl">Connect your Anthropic API key</div>'
     +   '<div class="tip-txt">This runs on your own Anthropic API key, called directly from the browser — nothing routes through a server, and the key is stored only on this device (not synced). Because it\'s a direct browser call, the key is technically visible to anyone with access to this browser\'s dev tools, so only use a key you\'re comfortable having on a personal device. Get one at <span style="text-decoration:underline">console.anthropic.com</span> → API Keys.</div>'
     +   '<div style="display:flex;gap:6px;margin-top:8px">'
-    +     '<input id="ck-key-input" type="password" placeholder="sk-ant-..." style="flex:1;padding:9px 10px;border-radius:10px;border:2px solid var(--b);font-size:13px" value="'+ceEsc(apiKey)+'">'
-    +     '<button class="tp" style="background:var(--ac);color:white;border-color:var(--ac)" onclick="saveKey()">Save</button>'
+    +     '<input id="'+trip+'-key-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="lvd-notpassword-'+trip+'" placeholder="sk-ant-..." style="flex:1;padding:9px 10px;border-radius:10px;border:2px solid var(--b);font-size:13px;-webkit-text-security:disc;text-security:disc" value="'+ceEsc(apiKey)+'">'
+    +     '<button class="tp" style="background:var(--ac);color:white;border-color:var(--ac)" onclick="saveKey(\''+trip+'\')">Save</button>'
     +   '</div>'
     + '</div>'
     + '<div class="tip-box" id="'+trip+'-key-active" style="'+(apiKey?'':'display:none')+';border-color:#22c55e;background:rgba(34,197,94,.08)">'
