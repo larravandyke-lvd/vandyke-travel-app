@@ -1586,15 +1586,15 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
       <div class="sec"><div class="sh"><div class="st">Weather</div><button class="sa" onclick="refreshAkWeather()">🔄 Refresh Weather</button></div>
         <div id="ak-weather-status" style="font-size:11px;color:var(--tm);margin-bottom:8px">Loading live forecast…</div>
         <div class="wxs" id="ak-weather-combined">
-          <div class="wxd2" id="wxday-0"><div class="wxn">Aug 13<br>Seattle</div><div id="wxlive-0">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">☀️ 72°/58° · 0% rain</div></div>
-          <div class="wxd2" id="wxday-1"><div class="wxn">Aug 14<br>Board Edge</div><div id="wxlive-1">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">⛅ 67°/61° · Chance</div></div>
-          <div class="wxd2" id="wxday-2"><div class="wxn">Aug 15<br>At Sea (N)</div><div id="wxlive-2">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">🌤 60°/46° · Clear</div></div>
-          <div class="wxd2" id="wxday-3"><div class="wxn">Aug 16<br>Ketchikan</div><div id="wxlive-3">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">🌧 58°/54° · 70% rain</div></div>
-          <div class="wxd2" id="wxday-4"><div class="wxn">Aug 17<br>Juneau</div><div id="wxlive-4">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">☀️ 41° · Sunny!</div></div>
-          <div class="wxd2" id="wxday-5"><div class="wxn">Aug 18<br>Skagway</div><div id="wxlive-5">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">⛅ 63°/50° · 30%</div></div>
-          <div class="wxd2" id="wxday-6"><div class="wxn">Aug 19<br>At Sea (S)</div><div id="wxlive-6">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">⛅ 63°/50° · Chance</div></div>
-          <div class="wxd2" id="wxday-7"><div class="wxn">Aug 20<br>Victoria</div><div id="wxlive-7">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">☁️ 63°/56° · Cloudy</div></div>
-          <div class="wxd2" id="wxday-8"><div class="wxn">Aug 21<br>Seattle</div><div id="wxlive-8">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">🌤 65° · —</div></div>
+          <div class="wxd2" id="wxday-0"><div class="wxn">Aug 13 · Pre-Cruise<br>Seattle</div><div id="wxlive-0">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">☀️ 72°/58° · 0% rain</div></div>
+          <div class="wxd2" id="wxday-1"><div class="wxn">Aug 14 · Day 1<br>Board Edge</div><div id="wxlive-1">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">⛅ 67°/61° · Chance</div></div>
+          <div class="wxd2" id="wxday-2"><div class="wxn">Aug 15 · Day 2<br>At Sea (N)</div><div id="wxlive-2">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">🌤 60°/46° · Clear</div></div>
+          <div class="wxd2" id="wxday-3"><div class="wxn">Aug 16 · Day 3<br>Ketchikan</div><div id="wxlive-3">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">🌧 58°/54° · 70% rain</div></div>
+          <div class="wxd2" id="wxday-4"><div class="wxn">Aug 17 · Day 4<br>Juneau</div><div id="wxlive-4">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">☀️ 41° · Sunny!</div></div>
+          <div class="wxd2" id="wxday-5"><div class="wxn">Aug 18 · Day 5<br>Skagway</div><div id="wxlive-5">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">⛅ 63°/50° · 30%</div></div>
+          <div class="wxd2" id="wxday-6"><div class="wxn">Aug 19 · Day 6<br>At Sea (S)</div><div id="wxlive-6">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">⛅ 63°/50° · Chance</div></div>
+          <div class="wxd2" id="wxday-7"><div class="wxn">Aug 20 · Day 7<br>Victoria</div><div id="wxlive-7">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">☁️ 63°/56° · Cloudy</div></div>
+          <div class="wxd2" id="wxday-8"><div class="wxn">Aug 21 · Day 8<br>Seattle</div><div id="wxlive-8">…</div><div class="wxd2-sep">Last Year</div><div class="wxd2-hist">🌤 65° · —</div></div>
         </div>
       <div style="font-size:11px;color:var(--tm);margin-top:7px;font-weight:500">Same cruise, same cabin 9195 last year · Live forecast above now auto-loads and should cover the full cruise week · Swipe to see all days — live and historical scroll together</div></div>
     </div>
@@ -2705,7 +2705,7 @@ function buildOutfitDays(trip, who) {
     card.addEventListener('dragstart', function(e) { dragSrc = card; e.dataTransfer.effectAllowed = 'move'; });
     var dateDiv = document.createElement('div');
     dateDiv.className = 'doc-date';
-    dateDiv.textContent = day.date;
+    dateDiv.textContent = trip === 'ak' ? (day.date + ' · ' + AK_CRUISE_DAY_LABELS[di]) : day.date;
     card.appendChild(dateDiv);
     var portDiv = document.createElement('div');
     portDiv.className = 'doc-port';
@@ -3105,6 +3105,12 @@ function renderJournalDay(trip, idx) {
   }).join('');
   card.innerHTML = header + prompts;
 }
+var AK_CRUISE_DAY_LABELS = ['Pre-Cruise','Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7','Day 8'];
+function akShortDate(idx){
+  var d = ITIN_DATA.ak[idx] ? ITIN_DATA.ak[idx].date : '';
+  var parts = d.split(' ');
+  return parts.length > 1 ? parts.slice(1).join(' ') : d;
+}
 function buildJournalNav(trip) {
   var nav = document.querySelector('#'+trip+'-journal .jnav');
   if (!nav) return;
@@ -3113,7 +3119,9 @@ function buildJournalNav(trip) {
   days.forEach(function(day, i) {
     var el = document.createElement('div');
     el.className = 'jd' + (i === 0 ? ' on' : '');
-    el.innerHTML = day.date + '<br>' + day.label;
+    var topLine = day.date;
+    if (trip === 'ak') topLine = AK_CRUISE_DAY_LABELS[i] + ' · ' + akShortDate(i);
+    el.innerHTML = topLine + '<br>' + day.label;
     el.onclick = function() { renderJournalDay(trip, i); };
     nav.appendChild(el);
   });
