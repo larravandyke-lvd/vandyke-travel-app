@@ -2828,13 +2828,15 @@ function lvdRemovePhoto(ns, idx) {
   var refreshFn = lvdPhotoRefreshers[ns];
   if (refreshFn) refreshFn();
 }
-function lvdCompressImage(dataUrl, cb) {
+function lvdCompressImage(dataUrl, cb, opts) {
   // Downscale + re-encode as JPEG so photos take a fraction of the raw camera-file size,
   // which is what was blowing through localStorage's quota on-device.
+  opts = opts || {};
+  var maxDim = opts.maxDim || 900;
+  var quality = opts.quality || 0.68;
   try {
     var img = new Image();
     img.onload = function() {
-      var maxDim = 1000;
       var w = img.width, h = img.height;
       if (w > maxDim || h > maxDim) {
         if (w >= h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
@@ -2845,14 +2847,14 @@ function lvdCompressImage(dataUrl, cb) {
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
       var out;
-      try { out = canvas.toDataURL('image/jpeg', 0.72); } catch(e) { out = dataUrl; }
+      try { out = canvas.toDataURL('image/jpeg', quality); } catch(e) { out = dataUrl; }
       cb(out || dataUrl);
     };
     img.onerror = function() { cb(dataUrl); };
     img.src = dataUrl;
   } catch(e) { cb(dataUrl); }
 }
-function lvdAddPhotos(ns, files, cb) {
+function lvdAddPhotos(ns, files, cb, compressOpts) {
   if (!files || !files.length) { if (cb) cb(); return; }
   var photos = lvdPhotos(ns);
   var remaining = files.length;
@@ -2863,7 +2865,7 @@ function lvdAddPhotos(ns, files, cb) {
         photos.push(compressed);
         remaining--;
         if (remaining === 0) { lvdSet('lvd_photos_' + ns, photos); if (cb) cb(); }
-      });
+      }, compressOpts);
     };
     r.readAsDataURL(f);
   });
@@ -3050,6 +3052,9 @@ function lvdQuickAddPhoto(ns, wrapId, isAvatar) {
   var inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = !isAvatar;
   inp.onchange = function(ev) {
+    // Avatars only ever render at ~38px, so compress them much harder than full-size photos —
+    // that's where the "storage full" errors were coming from.
+    var compressOpts = isAvatar ? {maxDim: 400, quality: 0.65} : null;
     lvdAddPhotos(ns, ev.target.files, function() {
       if (isAvatar) {
         var parts = ns.split('_'); // person_trip_id
@@ -3058,7 +3063,7 @@ function lvdQuickAddPhoto(ns, wrapId, isAvatar) {
       }
       var wrap = document.getElementById(wrapId);
       if (wrap) wrap.innerHTML = lvdPhotoThumbsHtml(ns) + '<div class="add-photo" onclick="lvdQuickAddPhoto(\'' + ns + '\',\'' + wrapId + '\')">+</div>';
-    });
+    }, compressOpts);
   };
   inp.click();
 }
@@ -3080,7 +3085,7 @@ function renderPeopleList(trip) {
       + '<div title="Delete" onclick="event.stopPropagation();deletePerson(\'' + trip + '\',\'' + p.id + '\')" style="cursor:pointer;font-size:14px;padding:2px;color:#dc2626">\ud83d\uddd1\ufe0f</div>'
       + '</div>';
     return '<div class="pc" style="cursor:pointer" onclick="openEditPerson(\'' + trip + '\',\'' + p.id + '\')">' + avatar + '<div style="flex:1"><div class="pr">' + (p.role || 'Guest') + '</div><div class="pname">' + p.name + '</div>'
-      + (p.notes ? '<div class="pnotes">' + p.notes + '</div>' : '') + '</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + (p.star && p.star.indexOf('Yes') > -1 ? '<div>⭐</div>' : '<div></div>') + actions + '</div></div>';
+      + (p.notes ? '<div class="pnotes">' + p.notes + '</div>' : '') + '</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + actions + '</div></div>';
   }).join('');
 }
 
@@ -5280,6 +5285,18 @@ function openAddPerson(trip){
   document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>See again?</label><select id="f-star"><option>Yes</option><option>Maybe</option><option>No</option></select></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
 }
+function changePersonPhotoFromEdit(trip, pid){
+  var ns = 'person_' + trip + '_' + pid;
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = function(ev){
+    lvdAddPhotos(ns, ev.target.files, function(){
+      renderPeopleList(trip);
+      openEditPerson(trip, pid); // refresh the modal so the bigger preview updates too
+    }, {maxDim:400, quality:0.65});
+  };
+  inp.click();
+}
 function openEditPerson(trip, pid){
   var list = lvdGet('lvd_peoplelist_' + trip, []);
   var p = list.find(function(x){ return x.id === pid; });
@@ -5289,7 +5306,15 @@ function openEditPerson(trip, pid){
   var starOpts = ['Yes','Maybe','No'].map(function(o){
     return '<option' + (p.star===o?' selected':'') + '>' + o + '</option>';
   }).join('');
-  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>See again?</label><select id="f-star">' + starOpts + '</select></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  var ns = 'person_' + trip + '_' + pid;
+  var photos = lvdPhotos(ns);
+  var bigPhotoHtml = photos.length
+    ? '<img src="' + photos[0] + '" style="width:140px;height:140px;object-fit:cover;border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,0.18)">'
+    : '<div class="pav" style="width:140px;height:140px;font-size:36px">' + p.init + '</div>';
+  var photoPreview = '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px">'
+    + '<div onclick="changePersonPhotoFromEdit(\'' + trip + '\',\'' + pid + '\');" title="Tap to change photo" style="cursor:pointer">' + bigPhotoHtml + '</div>'
+    + '<div style="font-size:11px;color:var(--tm)">Tap photo to change it</div></div>';
+  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>See again?</label><select id="f-star">' + starOpts + '</select></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
 }
 function deletePerson(trip, pid){
@@ -5393,7 +5418,7 @@ function saveM(){
       var list=lvdGet('lvd_peoplelist_'+mTrip, []);
       list.push({id:pid, name:useName, role:role, notes:notes, star:star, init:init});
       lvdSet('lvd_peoplelist_'+mTrip, list);
-      lvdAddPhotos('person_'+mTrip+'_'+pid, personFiles, function(){ renderPeopleList(mTrip); });
+      lvdAddPhotos('person_'+mTrip+'_'+pid, personFiles, function(){ renderPeopleList(mTrip); }, {maxDim:400, quality:0.65});
       renderPeopleList(mTrip);
     }
   } else if(mType==='person-edit'){
@@ -5415,7 +5440,7 @@ function saveM(){
       if(pePhotoFiles && pePhotoFiles.length){
         // Replace existing photo(s) rather than piling on top of old ones.
         lvdSet('lvd_photos_person_'+mTrip+'_'+mTarget, []);
-        lvdAddPhotos('person_'+mTrip+'_'+mTarget, pePhotoFiles, function(){ renderPeopleList(mTrip); });
+        lvdAddPhotos('person_'+mTrip+'_'+mTarget, pePhotoFiles, function(){ renderPeopleList(mTrip); }, {maxDim:400, quality:0.65});
       }
       renderPeopleList(mTrip);
     }
