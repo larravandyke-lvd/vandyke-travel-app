@@ -5330,7 +5330,7 @@ function endPkDrag(e){
 function openAddPerson(trip){
   mType='person';mTrip=trip;mTarget=null;
   document.getElementById('m-title').textContent='Add Person';
-  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metAtOptionsFor(trip) + '<option value="__custom__">+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:none"><label>Custom location</label><input id="f-met-custom"></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>See again?</label><select id="f-star"><option>Yes</option><option>Maybe</option><option>No</option></select></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metAtOptionsFor(trip) + '<option value="__custom__">+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:none"><label>Custom location</label><input id="f-met-custom"></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
   var metSel = document.getElementById('f-met-at');
   metSel.onchange = function() {
@@ -5355,9 +5355,6 @@ function openEditPerson(trip, pid){
   if (!p) return;
   mType='person-edit'; mTrip=trip; mTarget=pid;
   document.getElementById('m-title').textContent='Edit Person';
-  var starOpts = ['Yes','Maybe','No'].map(function(o){
-    return '<option' + (p.star===o?' selected':'') + '>' + o + '</option>';
-  }).join('');
   var ns = 'person_' + trip + '_' + pid;
   var photos = lvdPhotos(ns);
   var bigPhotoHtml = photos.length
@@ -5369,7 +5366,7 @@ function openEditPerson(trip, pid){
   var metAtVal = p.metAt || '';
   var metOptsHtml = metAtOptionsFor(trip, metAtVal);
   var metIsCustom = metAtVal && metOptsHtml.indexOf('value="' + metAtVal.replace(/"/g,'&quot;') + '"') === -1;
-  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metOptsHtml + '<option value="__custom__"' + (metIsCustom ? ' selected' : '') + '>+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:' + (metIsCustom ? '' : 'none') + '"><label>Custom location</label><input id="f-met-custom" value="' + (metIsCustom ? metAtVal.replace(/"/g,'&quot;') : '') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>See again?</label><select id="f-star">' + starOpts + '</select></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metOptsHtml + '<option value="__custom__"' + (metIsCustom ? ' selected' : '') + '>+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:' + (metIsCustom ? '' : 'none') + '"><label>Custom location</label><input id="f-met-custom" value="' + (metIsCustom ? metAtVal.replace(/"/g,'&quot;') : '') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
   var metSel = document.getElementById('f-met-at');
   metSel.onchange = function() {
@@ -5471,14 +5468,13 @@ function saveM(){
     var metCustomVal=document.getElementById('f-met-custom')?document.getElementById('f-met-custom').value:'';
     var metAt = metSelVal === '__custom__' ? metCustomVal : metSelVal;
     var notes=document.getElementById('f-notes')?document.getElementById('f-notes').value:'';
-    var star=document.getElementById('f-star')?document.getElementById('f-star').value:'';
     var personFiles=document.getElementById('f-person-photo')?document.getElementById('f-person-photo').files:null;
     if(name || (personFiles && personFiles.length)){
       var useName=name||'Guest';
       var init=useName.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var pid='p'+Date.now();
       var list=lvdGet('lvd_peoplelist_'+mTrip, []);
-      list.push({id:pid, name:useName, role:role, metAt:metAt, notes:notes, star:star, init:init});
+      list.push({id:pid, name:useName, role:role, metAt:metAt, notes:notes, init:init});
       lvdSet('lvd_peoplelist_'+mTrip, list);
       lvdAddPhotos('person_'+mTrip+'_'+pid, personFiles, function(){ renderPeopleList(mTrip); }, {maxDim:400, quality:0.65});
       renderPeopleList(mTrip);
@@ -5490,7 +5486,6 @@ function saveM(){
     var peMetCustomVal=document.getElementById('f-met-custom')?document.getElementById('f-met-custom').value:'';
     var peMetAt = peMetSelVal === '__custom__' ? peMetCustomVal : peMetSelVal;
     var peNotes=document.getElementById('f-notes')?document.getElementById('f-notes').value:'';
-    var peStar=document.getElementById('f-star')?document.getElementById('f-star').value:'';
     var pePhotoFiles=document.getElementById('f-person-photo')?document.getElementById('f-person-photo').files:null;
     var peList=lvdGet('lvd_peoplelist_'+mTrip, []);
     var peP=peList.find(function(x){ return x.id===mTarget; });
@@ -5500,7 +5495,7 @@ function saveM(){
       peP.role=peRole;
       peP.metAt=peMetAt;
       peP.notes=peNotes;
-      peP.star=peStar;
+      delete peP.star;
       peP.init=peUseName.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       lvdSet('lvd_peoplelist_'+mTrip, peList);
       if(pePhotoFiles && pePhotoFiles.length){
@@ -5713,7 +5708,7 @@ function renderConcierge(trip){
     +   '<div class="tip-lbl">Connect your Anthropic API key</div>'
     +   '<div class="tip-txt">This runs on your own Anthropic API key, called directly from the browser — nothing routes through a server, and the key is stored only on this device (not synced). Because it\'s a direct browser call, the key is technically visible to anyone with access to this browser\'s dev tools, so only use a key you\'re comfortable having on a personal device. Get one at <span style="text-decoration:underline">console.anthropic.com</span> → API Keys.</div>'
     +   '<div style="display:flex;gap:6px;margin-top:8px">'
-    +     '<input id="'+trip+'-key-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="lvd-notpassword-'+trip+'" placeholder="sk-ant-..." style="flex:1;padding:9px 10px;border-radius:10px;border:2px solid var(--b);font-size:13px;-webkit-text-security:disc;text-security:disc" value="'+ceEsc(apiKey)+'">'
+    +     '<input id="'+trip+'-key-input" type="password" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" name="lvd-key-'+trip+'" placeholder="sk-ant-..." style="flex:1;padding:9px 10px;border-radius:10px;border:2px solid var(--b);font-size:13px" value="'+ceEsc(apiKey)+'">'
     +     '<button class="tp" style="background:var(--ac);color:white;border-color:var(--ac)" onclick="saveKey(\''+trip+'\')">Save</button>'
     +   '</div>'
     + '</div>'
