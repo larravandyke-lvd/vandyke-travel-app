@@ -3086,6 +3086,7 @@ function renderPeopleList(trip) {
       + '<div title="Delete" onclick="event.stopPropagation();deletePerson(\'' + trip + '\',\'' + p.id + '\')" style="cursor:pointer;font-size:14px;padding:2px;color:#dc2626">\ud83d\uddd1\ufe0f</div>'
       + '</div>';
     return '<div class="pc" style="cursor:pointer" onclick="openEditPerson(\'' + trip + '\',\'' + p.id + '\')">' + avatar + '<div style="flex:1"><div class="pr">' + (p.role || 'Guest') + '</div><div class="pname">' + p.name + '</div>'
+      + (p.metAt ? '<div style="font-size:11px;color:var(--ac);font-weight:600;margin-top:1px">📍 ' + p.metAt + '</div>' : '')
       + (p.notes ? '<div class="pnotes">' + p.notes + '</div>' : '') + '</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + actions + '</div></div>';
   }).join('');
 }
@@ -3185,6 +3186,27 @@ function openTicketImage() {
 
 // ── RESTAURANT DATABASE WITH LOCATION, MENU, RESERVATION ──
 var RESTAURANTS = {"ak": [{"id": "chefs-table", "name": "Chef's Table", "icon": "👨‍🍳", "tag": "#1 Priority · 10-course tasting", "loc": "Deck 5 · Aft · Private Dining Room", "desc": "The ship's omakase experience. Executive chef-hosted, ~10 courses, kitchen tour, curated wine pairings. The hardest reservation on the ship — only ~12 seats per sailing.", "tip": "Go to the specialty desk before your cabin bags arrive. Dress to impress.", "menu": ["Amuse-bouche trio", "Hokkaido scallop crudo", "Foie gras torchon", "Maine lobster bisque", "Wagyu beef course", "Truffle risotto", "Duck breast, cherry gastrique", "Cheese course", "Chocolate souffle", "Mignardises"], "cocktail": "Wine pairings curated by the sommelier — trust them entirely", "specialty": true}, {"id": "eden-zodiac", "name": "Eden + Zodiac Bar", "icon": "🌿", "tag": "Theatrical tasting · Botanical venue", "loc": "Deck 4-5-6 · Aft · Eden", "desc": "Three-deck botanical wonderland with live performance during dinner. Zodiac bar has one of the best cocktail programs at sea.", "tip": "Your Victoria evening at 6:15 PM is the perfect finale.", "menu": ["Botanical amuse", "Heirloom tomato salad", "Pan-seared halibut", "Lamb rack, herb crust", "Forest floor dessert"], "cocktail": "Seasonal botanical cocktail with Alaska-sourced ingredients", "specialty": true}, {"id": "fine-cut", "name": "Fine Cut Steakhouse", "icon": "🥩", "tag": "Dry-aged prime · Steakhouse", "loc": "Deck 5 · Midship · Fine Cut", "desc": "Celebrity Edge's premier steakhouse. Dry-aged prime cuts, tableside preparations, deep bourbon program.", "tip": "Ask about Wagyu add-ons. Bone-in ribeye is the house signature.", "menu": ["Oysters Rockefeller", "Wedge salad", "Bone-in ribeye 22oz", "Filet mignon 8oz", "Wagyu add-on (market price)", "Truffle mac and cheese", "Creamed spinach", "Loaded baked potato", "NY cheesecake"], "cocktail": "Barrel-aged Manhattan or Whistlepig Rye Old Fashioned", "specialty": true}, {"id": "le-grand-bistro", "name": "Le Grand Bistro", "icon": "🥖", "tag": "French Brasserie · Casual", "loc": "Deck 5 · Forward · Le Grand Bistro", "desc": "True French brasserie — moules frites, croque madame, classic onion soup, steak frites done properly.", "tip": "Perfect sea day lunch or relaxed dinner night.", "menu": ["French onion soup", "Moules frites", "Croque madame", "Steak frites", "Creme brulee"], "cocktail": "Kir Royale or a glass of Sancerre", "specialty": true}, {"id": "luminae", "name": "Luminae", "icon": "✦", "tag": "Suite-exclusive · Every night", "loc": "Deck 3 · Aft · The Retreat", "desc": "As Sky Suite guests, Luminae is yours every night — private restaurant for suite guests only. Impeccable service ratio.", "tip": "Ask your sommelier to curate a wine journey across your nights here.", "menu": ["Daily changing tasting menu", "Chef's seasonal selections", "Always-available classics (steak, salmon, pasta)"], "cocktail": "", "specialty": true}, {"id": "raw-on-5", "name": "Raw on 5", "icon": "🍣", "tag": "Sushi · Crudo bar", "loc": "Deck 5 · Forward · Raw on 5", "desc": "Celebrity's sushi and raw bar — especially good sailing Alaskan waters. Ask for chef's selection omakase-style.", "tip": "Tell the chef you love omakase and want the freshest items.", "menu": ["Edamame", "Miso soup", "Spicy tuna roll", "Salmon belly nigiri", "Toro nigiri", "Rainbow roll", "Chef's omakase selection", "Mochi ice cream"], "cocktail": "Junmai daiginjo sake flight", "specialty": true}, {"id": "eden-cafe", "name": "Eden Café", "icon": "☕", "tag": "Complimentary · Breakfast & lunch", "loc": "Deck 5 · Aft, inside Eden", "desc": "Tucked just off the Eden Bar, this is a quiet spot for a complimentary morning coffee or light lunch bite, with a small outdoor seating area.", "tip": "A peaceful, less crowded alternative to the Oceanview Café for breakfast.", "menu": ["Pastries & breakfast bites", "Light lunch sandwiches", "Morning beverages"], "cocktail": "Coffee & espresso drinks", "specialty": false}, {"id": "main-dining", "name": "Main Dining (Cosmopolitan/Normandie/Tuscan/Cyprus)", "icon": "🍽️", "tag": "Complimentary · Choose your favorite", "loc": "Deck 3-4 · Four venues, same menu", "desc": "Celebrity Edge has four complimentary main dining rooms, each with its own decor and a small \"Exclusives\" menu: Cosmopolitan (new American), Normandie (French, with panels from the original SS Normandie), Tuscan (Southern Italian), and Cyprus (Mediterranean/seafood). All four share the same core nightly menu. Choose Celebrity Select Early (6PM) or Late (8:30PM) seating, or dine anytime.", "tip": "Try each one's \"Exclusives\" section — small menu of dishes unique to that room only.", "menu": ["Nightly rotating 4-course menu", "Each venue's Exclusives section", "Vegetarian & always-available options"], "cocktail": "Full bar service at each venue", "specialty": false}, {"id": "mast-grill", "name": "Mast Grill", "icon": "🍔", "tag": "Complimentary · Poolside · Lunch", "loc": "Deck 14 · Pool deck", "desc": "Celebrity's signature poolside grill — burgers, hot dogs, fries, and a toppings bar, all made-to-order. Casual lunch spot right by the pool.", "tip": "Items are made fresh, so expect a short wait (10–15 min) especially for veggie/turkey burgers.", "menu": ["Beef & cheeseburgers", "Veggie & turkey burgers", "Hot dogs", "French fries"], "cocktail": "Poolside bar nearby", "specialty": false}, {"id": "oceanview-cafe", "name": "Oceanview Café", "icon": "🥗", "tag": "Complimentary · Buffet · All meals", "loc": "Deck 14 · Aft", "desc": "Multi-station buffet with more \"live action\" cooking stations than other Celebrity ships — great for a casual breakfast, lunch, or late-night bite with ocean views.", "tip": "Good fallback on excursion days when you want to eat fast and get back to port activities.", "menu": ["Made-to-order omelets", "Carving station", "International stations", "Dessert bar"], "cocktail": "Self-serve juice & coffee", "specialty": false}], "lv": [{"id": "foodie-tour", "name": "Lip Smacking Foodie Tour (Craftsteak/Morimoto/Luchini)", "icon": "🎂", "tag": "PRE-BOOKED · Fri Jul 10 · 4:45 PM SHARP", "loc": "Meet at MGM Grand · Gold Lion Statue", "desc": "Tom Colicchio's A5 Kobe + Champagne at Craftsteak, then Iron Chef Morimoto omakase-style creations, then Luchini for the finale. Birthday celebration on file for Larra!", "tip": "DO NOT BE LATE — meet at MGM Grand Gold Lion Statue. Confirmation RYG7FDN, already paid $998.", "menu": ["Craftsteak: A5 Kobe wagyu, Champagne", "Morimoto: omakase-style Japanese", "Luchini: Italian finale"], "cocktail": "Champagne to open, then bartender's choice at Luchini", "specialty": true}, {"id": "sw-steakhouse", "name": "SW Steakhouse", "icon": "🥩", "tag": "Wynn signature steakhouse · Lake view", "loc": "Wynn Las Vegas · Tower Level", "desc": "One of the most acclaimed steakhouses in Vegas with lake views. Chef's tasting menu available — call ahead.", "tip": "Request the chef's seasonal menu, not standard a la carte.", "menu": ["Bone marrow with toast", "Wagyu carpaccio", "Dry-aged ribeye", "Lobster tail add-on", "Truffle fries", "Chocolate decadence"], "cocktail": "Wynn Bar & Lounge cocktails before dinner", "specialty": true}, {"id": "craftsteak", "name": "Craftsteak", "icon": "🍖", "tag": "Tom Colicchio · A5 Kobe · MGM Grand", "loc": "MGM Grand · 3799 S Las Vegas Blvd", "desc": "Tom Colicchio's flagship steakhouse. Certified A5 Kobe beef, shellfish platters, Champagne to open.", "tip": "The A5 Kobe wagyu is as good as it gets outside NYC.", "menu": ["Shellfish tower", "A5 Kobe wagyu", "Dry-aged NY strip", "Lobster mac and cheese", "Seasonal vegetables"], "cocktail": "Champagne to open the tour", "specialty": true}, {"id": "morimoto", "name": "Morimoto Las Vegas", "icon": "🍣", "tag": "Iron Chef · Omakase-style", "loc": "MGM Grand · 3799 S Las Vegas Blvd", "desc": "Iron Chef Masaharu Morimoto's Vegas outpost. Sophisticated Japanese with luxury ingredients.", "tip": "Ask for signature dishes rather than standard tour menu.", "menu": ["Wagyu beef tartare", "Toro tartare", "Wagyu tacos", "Tuna pizza", "Black cod miso", "Omakase selection"], "cocktail": "Japanese whisky highball or sake cocktail", "specialty": true}, {"id": "luchini", "name": "Luchini Restaurant", "icon": "🍝", "tag": "Modern Italian · MGM Grand", "loc": "MGM Grand · 3799 S Las Vegas Blvd", "desc": "MGM Grand's modern Italian spot — the current finale stop on the Lip Smacking tour, replacing the old Chez Bippy speakeasy leg.", "tip": "Ask what's freshly made in-house that day — the pasta program changes seasonally.", "menu": ["Housemade pastas", "Wood-fired entrees", "Seasonal antipasti", "Tiramisu"], "cocktail": "Italian aperitivo or espresso martini", "specialty": true}], "dn": [{"id": "steirereck", "name": "Steirereck im Stadtpark", "icon": "⭐⭐", "tag": "2 Michelin Stars · World Top 10", "loc": "Am Heumarkt 2A, 1030 Vienna", "desc": "Consistently ranked among the 10 best restaurants on Earth. Heinz Reitbauer's extraordinary Austrian cuisine.", "tip": "Book 3-6 months ahead. Trust the wine pairing entirely.", "menu": ["Seasonal vegetable tasting", "Lake fish crudo", "Veal sweetbreads", "Alpine lamb", "Austrian cheese course", "Stone fruit dessert"], "cocktail": "Gruner Veltliner pairing", "specialty": true}, {"id": "mraz-sohn", "name": "Mraz & Sohn", "icon": "⭐", "tag": "1 Michelin · Omakase-adjacent", "loc": "Wallensteinstrasse 59, 1200 Vienna", "desc": "Father and son team doing playful, surprising Austrian tasting menus. Closest to omakase in Vienna.", "tip": "Tell them you love Japanese precision and surprise.", "menu": ["Surprise tasting course 1-8", "Seasonal Austrian ingredients", "Chef's daily creation"], "cocktail": "", "specialty": true}, {"id": "borkonyha", "name": "Borkonyha Wine Kitchen", "icon": "🍷", "tag": "1 Michelin · Budapest", "loc": "Sas u. 3, 1051 Budapest", "desc": "The most accessible Michelin-starred restaurant in Budapest with a Hungarian-focused wine list.", "tip": "Order dry Tokaji and Egri Bikaver.", "menu": ["Hungarian charcuterie", "Goulash reimagined", "Duck breast, plum", "Foie gras", "Dobos torte"], "cocktail": "Dry Tokaji wine pairing", "specialty": true}, {"id": "szimpla", "name": "Szimpla Kert", "icon": "🍻", "tag": "Original ruin bar · Don't skip!", "loc": "Kazinczy u. 14, 1075 Budapest", "desc": "A reclaimed crumbling building turned into the most eclectic bar in Europe.", "tip": "Arrive around 9 PM on a weeknight.", "menu": ["Local craft beers", "Palinka shots", "Street food stalls inside"], "cocktail": "Hungarian craft beer flight", "specialty": true}]};
+
+// ── SHIP / VENUE AREAS FOR "WHERE WE MET" DROPDOWN ──
+var SHIP_AREAS = {
+  ak: ['🎰 Casino', '🎭 Eden Theatre / Main Show', '🎶 Zodiac Bar', '🏊 Resort Deck / Pool', '🌅 The Retreat Sundeck', '💆 Spa & Salon', '🏋️ Fitness Center', '🛍️ The Shops', '📷 Photo Gallery', '🛎️ Guest Services / Reception', '🍸 Martini Bar', '🎳 Vault Bar', '🚢 Gangway / Embarkation', '⚓ Muster Station', '🛋️ The Retreat Lounge', '🌉 Magic Carpet (Deck 5/14/16)'],
+  dn: ['🎭 Lounge / Evening Show', '🍸 Martini Bar', '☕ Café al Bacio', '🛍️ Boutique', '💆 Spa & Salon', '🏋️ Fitness Center', '☀️ Sundeck / Pool', '🛎️ Reception / Guest Services', '🚢 Gangway / Embarkation'],
+  lv: ['🎰 Casino Floor', '🎭 Showroom', '🏊 Pool', '🎲 Sportsbook', '🛎️ Hotel Lobby', '🍸 Hotel Bar/Lounge', '🎡 Sphere', '🚌 Big Bus Tour']
+};
+function metAtOptionsFor(trip, selected) {
+  var rests = RESTAURANTS[trip] || [];
+  var restOpts = rests.map(function(r) {
+    var val = r.icon + ' ' + r.name;
+    return '<option value="' + val.replace(/"/g,'&quot;') + '"' + (selected === val ? ' selected' : '') + '>' + val + '</option>';
+  }).join('');
+  var areas = SHIP_AREAS[trip] || [];
+  var areaOpts = areas.map(function(a) {
+    return '<option value="' + a.replace(/"/g,'&quot;') + '"' + (selected === a ? ' selected' : '') + '>' + a + '</option>';
+  }).join('');
+  return '<option value="">Choose a location</option>'
+    + '<optgroup label="Restaurants & Bars">' + restOpts + '</optgroup>'
+    + '<optgroup label="Ship / Venue Areas">' + areaOpts + '</optgroup>';
+}
 var DINING_RES = JSON.parse(localStorage.getItem('lvd_dining_res') || '{}');
 
 function renderRestaurants(trip) {
@@ -5308,8 +5330,12 @@ function endPkDrag(e){
 function openAddPerson(trip){
   mType='person';mTrip=trip;mTarget=null;
   document.getElementById('m-title').textContent='Add Person';
-  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>See again?</label><select id="f-star"><option>Yes</option><option>Maybe</option><option>No</option></select></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metAtOptionsFor(trip) + '<option value="__custom__">+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:none"><label>Custom location</label><input id="f-met-custom"></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>See again?</label><select id="f-star"><option>Yes</option><option>Maybe</option><option>No</option></select></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
+  var metSel = document.getElementById('f-met-at');
+  metSel.onchange = function() {
+    document.getElementById('f-met-custom-wrap').style.display = metSel.value === '__custom__' ? '' : 'none';
+  };
 }
 function changePersonPhotoFromEdit(trip, pid){
   var ns = 'person_' + trip + '_' + pid;
@@ -5340,8 +5366,15 @@ function openEditPerson(trip, pid){
   var photoPreview = '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px">'
     + '<div onclick="changePersonPhotoFromEdit(\'' + trip + '\',\'' + pid + '\');" title="Tap to change photo" style="cursor:pointer">' + bigPhotoHtml + '</div>'
     + '<div style="font-size:11px;color:var(--tm)">Tap photo to change it</div></div>';
-  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>See again?</label><select id="f-star">' + starOpts + '</select></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  var metAtVal = p.metAt || '';
+  var metOptsHtml = metAtOptionsFor(trip, metAtVal);
+  var metIsCustom = metAtVal && metOptsHtml.indexOf('value="' + metAtVal.replace(/"/g,'&quot;') + '"') === -1;
+  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metOptsHtml + '<option value="__custom__"' + (metIsCustom ? ' selected' : '') + '>+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:' + (metIsCustom ? '' : 'none') + '"><label>Custom location</label><input id="f-met-custom" value="' + (metIsCustom ? metAtVal.replace(/"/g,'&quot;') : '') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>See again?</label><select id="f-star">' + starOpts + '</select></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
   document.getElementById('overlay').classList.add('open');
+  var metSel = document.getElementById('f-met-at');
+  metSel.onchange = function() {
+    document.getElementById('f-met-custom-wrap').style.display = metSel.value === '__custom__' ? '' : 'none';
+  };
 }
 function deletePerson(trip, pid){
   if (!confirm('Remove this person?')) return;
@@ -5434,6 +5467,9 @@ function saveM(){
   } else if(mType==='person'){
     var name=document.getElementById('f-name')?document.getElementById('f-name').value:'';
     var role=document.getElementById('f-role')?document.getElementById('f-role').value:'';
+    var metSelVal=document.getElementById('f-met-at')?document.getElementById('f-met-at').value:'';
+    var metCustomVal=document.getElementById('f-met-custom')?document.getElementById('f-met-custom').value:'';
+    var metAt = metSelVal === '__custom__' ? metCustomVal : metSelVal;
     var notes=document.getElementById('f-notes')?document.getElementById('f-notes').value:'';
     var star=document.getElementById('f-star')?document.getElementById('f-star').value:'';
     var personFiles=document.getElementById('f-person-photo')?document.getElementById('f-person-photo').files:null;
@@ -5442,7 +5478,7 @@ function saveM(){
       var init=useName.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var pid='p'+Date.now();
       var list=lvdGet('lvd_peoplelist_'+mTrip, []);
-      list.push({id:pid, name:useName, role:role, notes:notes, star:star, init:init});
+      list.push({id:pid, name:useName, role:role, metAt:metAt, notes:notes, star:star, init:init});
       lvdSet('lvd_peoplelist_'+mTrip, list);
       lvdAddPhotos('person_'+mTrip+'_'+pid, personFiles, function(){ renderPeopleList(mTrip); }, {maxDim:400, quality:0.65});
       renderPeopleList(mTrip);
@@ -5450,6 +5486,9 @@ function saveM(){
   } else if(mType==='person-edit'){
     var peName=document.getElementById('f-name')?document.getElementById('f-name').value:'';
     var peRole=document.getElementById('f-role')?document.getElementById('f-role').value:'';
+    var peMetSelVal=document.getElementById('f-met-at')?document.getElementById('f-met-at').value:'';
+    var peMetCustomVal=document.getElementById('f-met-custom')?document.getElementById('f-met-custom').value:'';
+    var peMetAt = peMetSelVal === '__custom__' ? peMetCustomVal : peMetSelVal;
     var peNotes=document.getElementById('f-notes')?document.getElementById('f-notes').value:'';
     var peStar=document.getElementById('f-star')?document.getElementById('f-star').value:'';
     var pePhotoFiles=document.getElementById('f-person-photo')?document.getElementById('f-person-photo').files:null;
@@ -5459,6 +5498,7 @@ function saveM(){
       var peUseName=peName||peP.name||'Guest';
       peP.name=peUseName;
       peP.role=peRole;
+      peP.metAt=peMetAt;
       peP.notes=peNotes;
       peP.star=peStar;
       peP.init=peUseName.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
