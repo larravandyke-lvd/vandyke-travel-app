@@ -401,6 +401,14 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
 .lday-body-inner{padding:0 14px 14px;font-size:13.5px;line-height:1.75;color:#5a1a30;font-family:Georgia,'Times New Roman',serif}
 .lday-sign{margin-top:10px;font-style:italic;font-size:12.5px;color:#c22458;font-weight:700;text-align:right}
 .letter-locked-tab{text-align:center;padding:40px 20px;color:#a45a72;font-size:14px;line-height:1.7}
+.pin-lock-card{text-align:center;padding:44px 22px;border-radius:18px;background:linear-gradient(160deg,#fff0f5,#ffe4ec);border:2px solid #f3b6cc;box-shadow:0 8px 24px rgba(216,74,120,.12)}
+.pin-lock-icon{font-size:30px;margin-bottom:10px}
+.pin-lock-title{font-size:15px;font-weight:800;color:#c22458;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.pin-lock-sub{font-size:13px;color:#a45a72;margin-bottom:16px}
+.pin-lock-input{width:120px;text-align:center;font-size:22px;letter-spacing:6px;padding:10px 8px;border-radius:10px;border:1.5px solid #f3b6cc;background:white;color:#5a1a30;margin-bottom:12px}
+.pin-lock-input:focus{outline:none;border-color:#c22458}
+.pin-lock-btn{display:block;margin:0 auto;padding:10px 26px;border-radius:20px;border:none;background:#c22458;color:white;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+.pin-lock-err{color:#c22458;font-size:12px;font-weight:700;margin-top:10px}
 
 /* Deck plan schematics */
 .deck-toggle-lnk{float:right;font-size:11px;color:var(--ac);font-weight:600}
@@ -4618,9 +4626,41 @@ function renderSkyAndHoroscope(){
   el.innerHTML = html;
 }
 
+var ERIC_PIN = '1018';
+function lvdPrivateUnlocked(){
+  return sessionStorage.getItem('lvdPrivateUnlocked') === '1';
+}
+function pinLockHtml(tab){
+  return '<div class="sec"><div class="pin-lock-card">'
+    + '<div class="pin-lock-icon">\ud83d\udd12</div>'
+    + '<div class="pin-lock-title">Private \u2014 For Eric\u2019s Eyes Only</div>'
+    + '<div class="pin-lock-sub">Enter PIN to view</div>'
+    + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" class="pin-lock-input" id="pin-input-'+tab+'" placeholder="\u2022\u2022\u2022\u2022" onkeydown="if(event.key===\'Enter\')checkEricPin(\''+tab+'\')">'
+    + '<button class="pin-lock-btn" onclick="checkEricPin(\''+tab+'\')">Unlock</button>'
+    + '<div class="pin-lock-err" id="pin-err-'+tab+'" style="display:none">Incorrect PIN</div>'
+    + '</div></div>';
+}
+function checkEricPin(tab){
+  var input = document.getElementById('pin-input-'+tab);
+  var err = document.getElementById('pin-err-'+tab);
+  if(!input) return;
+  if(input.value === ERIC_PIN){
+    sessionStorage.setItem('lvdPrivateUnlocked', '1');
+    if(tab === 'watch') renderWatchTab();
+    else if(tab === 'letter') renderLetterTab();
+  } else {
+    if(err) err.style.display = '';
+    input.value = '';
+    input.focus();
+  }
+}
 function renderWatchTab(){
   var panel = document.getElementById('ak-watch');
   if(!panel) return;
+  if(!lvdPrivateUnlocked()){
+    panel.innerHTML = pinLockHtml('watch');
+    return;
+  }
   panel.innerHTML = '<div class="sec"><div class="watch-card" id="watch-card">'
     + '<div class="letter-glow"></div>'
     + '<div class="watch-icons" id="watch-icons"></div>'
@@ -4697,6 +4737,10 @@ function renderLetterTab(){
   if(navBtn) navBtn.style.display = '';
   if(wasHidden && document.getElementById('trip-alaska') && document.getElementById('trip-alaska').style.display !== 'none'){
     akP('letter', navBtn);
+  }
+  if(!lvdPrivateUnlocked()){
+    panel.innerHTML = pinLockHtml('letter');
+    return;
   }
   var hearts = '';
   var emojis = ['\u2764\ufe0f','\ud83d\udc95','\ud83d\udc96','\ud83d\udc97'];
