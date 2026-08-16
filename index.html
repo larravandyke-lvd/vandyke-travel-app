@@ -2318,6 +2318,15 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
   </div>
 </div>
 
+<!-- PHOTO PICKER (choose from uploaded outfit photos, or upload new) -->
+<div class="overlay" id="photo-picker-overlay" onclick="if(event.target===this)closePhotoPicker()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:380px">
+    <h3 id="ppk-title">Add Photo</h3>
+    <div id="ppk-body"></div>
+    <div class="mbtns"><button class="mcancel" onclick="closePhotoPicker()">Close</button></div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -2705,6 +2714,19 @@ function buildOutfitDays(trip, who) {
     var dateDiv = document.createElement('div');
     dateDiv.className = 'doc-date';
     dateDiv.textContent = trip === 'ak' ? (day.date + ' · ' + AK_CRUISE_DAY_LABELS[di]) : day.date;
+    if (trip === 'ak') {
+      var wx = getAkDayWx(di);
+      if (wx) {
+        dateDiv.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px';
+        var dateTextSpan = document.createElement('span');
+        dateTextSpan.textContent = dateDiv.textContent;
+        dateDiv.textContent = '';
+        dateDiv.appendChild(dateTextSpan);
+        var wxSpan = document.createElement('span');
+        wxSpan.innerHTML = wxBadgeHtml(wx);
+        dateDiv.appendChild(wxSpan);
+      }
+    }
     card.appendChild(dateDiv);
     var portDiv = document.createElement('div');
     portDiv.className = 'doc-port';
@@ -2785,10 +2807,7 @@ function renderOutfitSlotUI(el, ns) {
   var addBtn = el.querySelector('.os-add-photo');
   if (addBtn) addBtn.addEventListener('click', function(e) {
     e.stopPropagation();
-    var inp = document.createElement('input');
-    inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
-    inp.onchange = function(ev) { lvdAddPhotos(ns, ev.target.files, function() { renderOutfitSlotUI(el, ns); }); };
-    inp.click();
+    openSlotPhotoPicker(ns, function() { renderOutfitSlotUI(el, ns); });
   });
   el.onclick = function() {
     openOutfitSlot(el, el.dataset.trip, el.dataset.who, el.dataset.di, el.dataset.si, label);
@@ -2870,6 +2889,64 @@ function lvdAddPhotos(ns, files, cb, compressOpts) {
   });
 }
 var lvdPhotoRefreshers = {}; // ns -> function that re-renders that photo strip in place
+
+// ── PHOTO PICKER (tap to pick from unsorted outfit photos, or upload new) ──
+var ppkTargetNs = null;
+var ppkRefreshCb = null;
+function openSlotPhotoPicker(ns, refreshCb){
+  ppkTargetNs = ns;
+  ppkRefreshCb = refreshCb;
+  var parts = ns.split('_'); // outfit_<trip>_<who>_<di>_<si>
+  var trip = parts[1], who = parts[2];
+  var poolNs = 'outfit_pool_' + trip + '_' + who;
+  var poolPhotos = lvdPhotos(poolNs);
+  var body = document.getElementById('ppk-body');
+  var html = '';
+  if (poolPhotos.length) {
+    html += '<div style="font-size:11px;color:var(--tm);text-transform:uppercase;font-weight:700;margin-bottom:8px">Tap a photo to add it here</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">';
+    poolPhotos.forEach(function(src, idx){
+      html += '<div style="width:64px;height:64px;border-radius:8px;overflow:hidden;cursor:pointer;flex-shrink:0" onclick="pickPoolPhotoForSlot(\'' + poolNs + '\',' + idx + ')"><img src="' + src + '" style="width:100%;height:100%;object-fit:cover;display:block"></div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--tm);margin-bottom:14px">No unsorted photos yet — upload some below, or add them from the Outfit Bank photo pool.</div>';
+  }
+  html += '<button class="addbtn" onclick="uploadNewPhotoForSlot()">＋ Upload New Photo</button>';
+  body.innerHTML = html;
+  document.getElementById('photo-picker-overlay').classList.add('open');
+}
+function closePhotoPicker(){
+  document.getElementById('photo-picker-overlay').classList.remove('open');
+  ppkTargetNs = null; ppkRefreshCb = null;
+}
+function pickPoolPhotoForSlot(poolNs, idx){
+  var poolPhotos = lvdPhotos(poolNs);
+  var src = poolPhotos[idx];
+  if (src === undefined || !ppkTargetNs) return;
+  poolPhotos.splice(idx, 1);
+  lvdSet('lvd_photos_' + poolNs, poolPhotos);
+  var targetPhotos = lvdPhotos(ppkTargetNs);
+  targetPhotos.push(src);
+  lvdSet('lvd_photos_' + ppkTargetNs, targetPhotos);
+  var poolParts = poolNs.split('_'); // outfit_pool_<trip>_<who>
+  renderPhotoPool(poolParts[2], poolParts[3]);
+  var cb = ppkRefreshCb;
+  closePhotoPicker();
+  if (cb) cb();
+}
+function uploadNewPhotoForSlot(){
+  if (!ppkTargetNs) return;
+  var ns = ppkTargetNs;
+  var cb = ppkRefreshCb;
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.onchange = function(ev){
+    lvdAddPhotos(ns, ev.target.files, function(){ closePhotoPicker(); if (cb) cb(); });
+  };
+  inp.click();
+}
+
 
 function poolFilesSelected(trip, who, files){
   var ns = 'outfit_pool_' + trip + '_' + who;
@@ -3983,11 +4060,16 @@ function renderDiningCalendar(trip) {
   var days = ITIN_DATA[trip];
   var mealNames = ['Breakfast', 'Lunch', 'Dinner'];
   var html = '<div class="dcal-wrap"><table class="dcal"><thead><tr><th>Meal</th>';
-  days.forEach(function(day) {
+  days.forEach(function(day, di) {
     var parts = day.date.split(' ');
     var wd = parts[0];
     var md = parts.slice(1).join(' ');
-    html += '<th>' + wd + '<br>' + md + '</th>';
+    var wxLine = '';
+    if (trip === 'ak') {
+      var wx = getAkDayWx(di);
+      if (wx) wxLine = '<br><span style="font-size:9px;font-weight:600;color:var(--ts)">' + wx.icon + ' ' + wx.hi + '°/' + wx.lo + '°</span>';
+    }
+    html += '<th>' + wd + '<br>' + md + wxLine + '</th>';
   });
   html += '</tr></thead><tbody>';
   mealNames.forEach(function(mealName) {
@@ -4030,8 +4112,21 @@ function renderUnifiedDining(trip) {
   res.forEach(function(r) {
     if (r.day !== lastDay) {
       var dayHeader = document.createElement('div');
-      dayHeader.style.cssText = 'font-size:11px;font-weight:700;color:var(--ac);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.06em';
-      dayHeader.textContent = r.day;
+      dayHeader.style.cssText = 'font-size:11px;font-weight:700;color:var(--ac);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;justify-content:space-between;gap:8px';
+      var dayHeaderText = document.createElement('span');
+      dayHeaderText.textContent = r.day;
+      dayHeader.appendChild(dayHeaderText);
+      if (trip === 'ak') {
+        var akDi = ITIN_DATA.ak.findIndex(function(d){ return d.date === r.day; });
+        var wx = akDi > -1 ? getAkDayWx(akDi) : null;
+        if (wx) {
+          var wxSpan = document.createElement('span');
+          wxSpan.style.textTransform = 'none';
+          wxSpan.style.letterSpacing = 'normal';
+          wxSpan.innerHTML = wxBadgeHtml(wx);
+          dayHeader.appendChild(wxSpan);
+        }
+      }
       list.appendChild(dayHeader);
       lastDay = r.day;
     }
@@ -5026,6 +5121,12 @@ function hidePastWeatherDays(){
     doneMsg.remove();
   }
 }
+// Re-renders outfit + dining views that show weather badges, once fresh forecast data lands in the cache.
+function refreshWeatherDependentViews(){
+  ['lvd','evd'].forEach(function(who){ buildOutfitDays('ak', who); });
+  if (document.getElementById('ak-dining-list')) renderUnifiedDining('ak');
+  if (document.getElementById('ak-dining-calendar')) renderDiningCalendar('ak');
+}
 
 var PORT_DAY_INFO = {
   'ak-port-seattle': {idx:0, cruiseDay:null},
@@ -5187,6 +5288,26 @@ function getWeatherCache(){
 function setWeatherCache(cache){
   try { localStorage.setItem('ak_weather_cache', JSON.stringify(cache)); } catch(e){}
 }
+// Shared lookup for "day index -> forecast" used by outfits + dining, keyed off AK_WEATHER_DAYS (Alaska only).
+function getAkDayWx(di){
+  var d = AK_WEATHER_DAYS[di];
+  if(!d) return null;
+  var cache = getWeatherCache();
+  var data = cache ? cache[d.lat+','+d.lon] : null;
+  if(!data || data.failed || !data.daily) return null;
+  var idx = data.daily.time.indexOf(d.date);
+  if(idx < 0) return null;
+  return {
+    hi: Math.round(data.daily.temperature_2m_max[idx]),
+    lo: Math.round(data.daily.temperature_2m_min[idx]),
+    pop: data.daily.precipitation_probability_max[idx],
+    icon: wxIconFor(data.daily.weathercode[idx])
+  };
+}
+function wxBadgeHtml(wx){
+  if(!wx) return '';
+  return '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--acb);border:1px solid var(--b);border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--ac);white-space:nowrap"><span style="font-size:13px">'+wx.icon+'</span>'+wx.hi+'°/'+wx.lo+'°F</span>';
+}
 
 var _weatherRefreshInProgress = false;
 async function refreshAkWeather(){
@@ -5247,6 +5368,7 @@ async function refreshAkWeather(){
     renderPortDayWeather(results);
     hidePastWeatherDays();
     renderCurrentTemp(results);
+    refreshWeatherDependentViews();
     if(statusEl){
       if(anyFailed){
         statusEl.textContent = '⚠️ Some locations failed after 3 tries (real network issue) — tap Refresh to retry; other days shown are accurate.';
