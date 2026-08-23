@@ -3155,7 +3155,7 @@ function renderPeopleList(trip) {
       + '<div title="Edit" onclick="event.stopPropagation();openEditPerson(\'' + trip + '\',\'' + p.id + '\')" style="cursor:pointer;font-size:14px;padding:2px">\u270f\ufe0f</div>'
       + '<div title="Delete" onclick="event.stopPropagation();deletePerson(\'' + trip + '\',\'' + p.id + '\')" style="cursor:pointer;font-size:14px;padding:2px;color:#dc2626">\ud83d\uddd1\ufe0f</div>'
       + '</div>';
-    return '<div class="pc" style="cursor:pointer" onclick="openEditPerson(\'' + trip + '\',\'' + p.id + '\')">' + avatar + '<div style="flex:1"><div class="pr">' + (p.role || 'Guest') + '</div><div class="pname">' + p.name + '</div>'
+    return '<div class="pc" style="cursor:pointer" onclick="openEditPerson(\'' + trip + '\',\'' + p.id + '\')">' + avatar + '<div style="flex:1"><div class="pr">' + (p.role || 'Guest') + (p.country ? ' · 🌍 ' + p.country : '') + '</div><div class="pname">' + p.name + '</div>'
       + (p.metAt ? '<div style="font-size:11px;color:var(--ac);font-weight:600;margin-top:1px">📍 ' + p.metAt + '</div>' : '')
       + (p.notes ? '<div class="pnotes">' + p.notes + '</div>' : '') + '</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + actions + '</div></div>';
   }).join('');
@@ -5481,12 +5481,14 @@ function endPkDrag(e){
 function openAddPerson(trip){
   mType='person';mTrip=trip;mTarget=null;
   document.getElementById('m-title').textContent='Add Person';
-  document.getElementById('m-body').innerHTML='<div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metAtOptionsFor(trip) + '<option value="__custom__">+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:none"><label>Custom location</label><input id="f-met-custom"></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div><div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  document.getElementById('m-body').innerHTML='<div class="mf"><label>Photo</label><input type="file" id="f-person-photo" accept="image/*"><div id="f-scan-status" style="font-size:12px;color:var(--tm);margin-top:6px"></div></div><div class="mf"><label>Name</label><input id="f-name"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..."></div><div class="mf"><label>Country of Origin</label><input id="f-country" placeholder="e.g. Philippines"></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metAtOptionsFor(trip) + '<option value="__custom__">+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:none"><label>Custom location</label><input id="f-met-custom"></div><div class="mf"><label>Notes</label><textarea id="f-notes"></textarea></div>';
   document.getElementById('overlay').classList.add('open');
   var metSel = document.getElementById('f-met-at');
   metSel.onchange = function() {
     document.getElementById('f-met-custom-wrap').style.display = metSel.value === '__custom__' ? '' : 'none';
   };
+  var photoInp = document.getElementById('f-person-photo');
+  if (photoInp) photoInp.onchange = function(){ scanPersonPhoto(); };
 }
 function changePersonPhotoFromEdit(trip, pid){
   var ns = 'person_' + trip + '_' + pid;
@@ -5517,12 +5519,80 @@ function openEditPerson(trip, pid){
   var metAtVal = p.metAt || '';
   var metOptsHtml = metAtOptionsFor(trip, metAtVal);
   var metIsCustom = metAtVal && metOptsHtml.indexOf('value="' + metAtVal.replace(/"/g,'&quot;') + '"') === -1;
-  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metOptsHtml + '<option value="__custom__"' + (metIsCustom ? ' selected' : '') + '>+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:' + (metIsCustom ? '' : 'none') + '"><label>Custom location</label><input id="f-met-custom" value="' + (metIsCustom ? metAtVal.replace(/"/g,'&quot;') : '') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div><div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"></div>';
+  document.getElementById('m-body').innerHTML=photoPreview+'<div class="mf"><label>Add/Replace Photo</label><input type="file" id="f-person-photo" accept="image/*"><div id="f-scan-status" style="font-size:12px;color:var(--tm);margin-top:6px"></div></div><div class="mf"><label>Name</label><input id="f-name" value="' + (p.name||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Role</label><input id="f-role" placeholder="Butler, Guide, Fellow Guest..." value="' + (p.role||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Country of Origin</label><input id="f-country" placeholder="e.g. Philippines" value="' + (p.country||'').replace(/"/g,'&quot;') + '"></div><div class="mf"><label>Where we met</label><select id="f-met-at">' + metOptsHtml + '<option value="__custom__"' + (metIsCustom ? ' selected' : '') + '>+ Type my own...</option></select></div><div class="mf" id="f-met-custom-wrap" style="display:' + (metIsCustom ? '' : 'none') + '"><label>Custom location</label><input id="f-met-custom" value="' + (metIsCustom ? metAtVal.replace(/"/g,'&quot;') : '') + '"></div><div class="mf"><label>Notes</label><textarea id="f-notes">' + (p.notes||'') + '</textarea></div>';
   document.getElementById('overlay').classList.add('open');
   var metSel = document.getElementById('f-met-at');
   metSel.onchange = function() {
     document.getElementById('f-met-custom-wrap').style.display = metSel.value === '__custom__' ? '' : 'none';
   };
+  var photoInp = document.getElementById('f-person-photo');
+  if (photoInp) photoInp.onchange = function(){ scanPersonPhoto(); };
+}
+function scanPersonPhoto(){
+  var inp = document.getElementById('f-person-photo');
+  var file = inp && inp.files && inp.files[0];
+  var statusEl = document.getElementById('f-scan-status');
+  if (!file) return;
+  if (!apiKey) {
+    if (statusEl) statusEl.innerHTML = '⚠️ Add your AI key in the Concierge tab to auto-scan name tags.';
+    return;
+  }
+  if (statusEl) statusEl.innerHTML = '🔍 Scanning name tag…';
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var dataUrl = ev.target.result;
+    var semi = dataUrl.indexOf(';');
+    var comma = dataUrl.indexOf(',');
+    var mediaType = dataUrl.substring(5, semi);
+    var b64 = dataUrl.substring(comma + 1);
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } },
+            { type: 'text', text: 'This photo shows a crew/staff name tag or badge (commonly seen on cruise ships). Read it and respond with ONLY a raw JSON object, no markdown fences, no preamble, in exactly this shape: {"name":"","role":"","country":""}. "name" is the person\'s name as printed on the tag. "role" is their job title/position as printed. "country" is their country of origin if shown on the tag (spell out the country name rather than just describing a flag). If a field is not visible on the tag, use an empty string for it. If the photo does not appear to show a name tag at all, still return the JSON shape with your best guess or empty strings.' }
+          ]
+        }]
+      })
+    })
+    .then(function(r){
+      if (!r.ok) { return r.json().then(function(e){ throw new Error((e.error && e.error.message) || ('API error ' + r.status)); }); }
+      return r.json();
+    })
+    .then(function(data){
+      var txt = data.content && data.content.find(function(b){ return b.type === 'text'; });
+      var raw = txt ? txt.text.trim() : '';
+      raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+      var parsed = null;
+      try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+      if (parsed) {
+        var nameEl = document.getElementById('f-name');
+        var roleEl = document.getElementById('f-role');
+        var countryEl = document.getElementById('f-country');
+        if (nameEl && parsed.name) nameEl.value = parsed.name;
+        if (roleEl && parsed.role) roleEl.value = parsed.role;
+        if (countryEl && parsed.country) countryEl.value = parsed.country;
+        var gotAny = parsed.name || parsed.role || parsed.country;
+        if (statusEl) statusEl.innerHTML = gotAny ? '✅ Pulled from name tag — double-check before saving.' : '⚠️ Could not find a name tag in that photo — fill in manually.';
+      } else {
+        if (statusEl) statusEl.innerHTML = '⚠️ Could not read the name tag clearly — fill in manually.';
+      }
+    })
+    .catch(function(err){
+      if (statusEl) statusEl.innerHTML = '⚠️ ' + (err.message || 'Scan failed — fill in manually.');
+    });
+  };
+  reader.readAsDataURL(file);
 }
 function deletePerson(trip, pid){
   if (!confirm('Remove this person?')) return;
@@ -5615,6 +5685,7 @@ function saveM(){
   } else if(mType==='person'){
     var name=document.getElementById('f-name')?document.getElementById('f-name').value:'';
     var role=document.getElementById('f-role')?document.getElementById('f-role').value:'';
+    var country=document.getElementById('f-country')?document.getElementById('f-country').value:'';
     var metSelVal=document.getElementById('f-met-at')?document.getElementById('f-met-at').value:'';
     var metCustomVal=document.getElementById('f-met-custom')?document.getElementById('f-met-custom').value:'';
     var metAt = metSelVal === '__custom__' ? metCustomVal : metSelVal;
@@ -5625,7 +5696,7 @@ function saveM(){
       var init=useName.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var pid='p'+Date.now();
       var list=lvdGet('lvd_peoplelist_'+mTrip, []);
-      list.push({id:pid, name:useName, role:role, metAt:metAt, notes:notes, init:init});
+      list.push({id:pid, name:useName, role:role, country:country, metAt:metAt, notes:notes, init:init});
       lvdSet('lvd_peoplelist_'+mTrip, list);
       lvdAddPhotos('person_'+mTrip+'_'+pid, personFiles, function(){ renderPeopleList(mTrip); }, {maxDim:400, quality:0.65});
       renderPeopleList(mTrip);
@@ -5633,6 +5704,7 @@ function saveM(){
   } else if(mType==='person-edit'){
     var peName=document.getElementById('f-name')?document.getElementById('f-name').value:'';
     var peRole=document.getElementById('f-role')?document.getElementById('f-role').value:'';
+    var peCountry=document.getElementById('f-country')?document.getElementById('f-country').value:'';
     var peMetSelVal=document.getElementById('f-met-at')?document.getElementById('f-met-at').value:'';
     var peMetCustomVal=document.getElementById('f-met-custom')?document.getElementById('f-met-custom').value:'';
     var peMetAt = peMetSelVal === '__custom__' ? peMetCustomVal : peMetSelVal;
@@ -5644,6 +5716,7 @@ function saveM(){
       var peUseName=peName||peP.name||'Guest';
       peP.name=peUseName;
       peP.role=peRole;
+      peP.country=peCountry;
       peP.metAt=peMetAt;
       peP.notes=peNotes;
       delete peP.star;
