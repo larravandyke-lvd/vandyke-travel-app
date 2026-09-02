@@ -69,6 +69,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
 .addbtn:hover{background:var(--b)}
 .copy-b{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--ts);cursor:pointer;padding:3px 8px;border:1px solid var(--b);border-radius:8px;transition:all .12s;margin-top:4px;background:var(--acb);font-weight:500}
 .copy-b:hover{border-color:var(--bs);color:var(--ac)}
+.dntp-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.dntp-tab{flex:0 0 auto;padding:10px 14px;border-radius:12px;border:2px solid var(--b);background:white;color:var(--ts);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.dntp-tab.on{background:var(--hb);border-color:transparent;color:white;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.dntp-panel{display:none}
+.dntp-panel.on{display:block}
+.flow-step{display:flex;gap:0}
+.flow-body{flex:1;border-left:3px solid var(--b);padding:0 0 16px 14px;margin-left:4px}
+.flow-body.g{border-left-color:#22c55e}
+.flow-body.a{border-left-color:#f59e0b}
+.flow-date{font-size:9.5px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.flow-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.flow-desc{font-size:11.5px;color:var(--ts);line-height:1.6}
+.flow-tag{display:inline-block;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:8px;margin-top:6px;text-transform:uppercase;letter-spacing:.03em}
+.flow-tag.g{background:rgba(34,197,94,.15);color:#15803d}
+.flow-tag.a{background:rgba(245,158,11,.15);color:#92400e}
+.cmp-table{width:100%;border-collapse:collapse;font-size:11px}
+.cmp-table td{padding:7px 6px;border-bottom:1px solid var(--b)}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table .cmp-lbl{font-weight:700;color:var(--ts);white-space:nowrap}
+.cmp-table .cmp-hdr{font-weight:800;text-align:center;font-size:11px}
+.cmp-table td.cmp-val{text-align:center}
+.cmp-both-col{background:var(--acb)}
 .warn-box{background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:10px 14px;font-size:11px;color:#92400e;margin-bottom:10px;font-weight:500}
 .tip-box{background:var(--acb);border:2px solid var(--b);border-radius:12px;padding:11px 14px;margin-bottom:10px}
 .fact-card{background:#fffbeb;border:2px solid #e8c874;border-radius:12px;padding:11px 14px;margin-bottom:10px}
@@ -1867,86 +1889,239 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
       </div>
     </div>
     <div class="panel" id="dn-travel">
-      <div class="sec"><div class="sh"><div class="st">Travel Plan — Flights (Not Yet Booked)</div></div>
-        <div class="tip-box" style="border-color:#f59e0b;background:rgba(245,158,11,.08)"><div class="tip-lbl" style="color:#92400e">📌 Working notes — keep updating this tab until finalized</div><div class="tip-txt">This is a holding area for flight research. Nothing booked yet. Based on Post-Stay Prague plan (not Budapest Pre-Stay).</div></div>
+      <div class="sec"><div class="sh"><div class="st">Travel Plan — Pre/Post-Stay Scenarios (Not Yet Booked)</div></div>
+        <div class="tip-box" style="border-color:#f59e0b;background:rgba(245,158,11,.08)"><div class="tip-lbl" style="color:#92400e">📌 Working notes — nothing booked yet</div><div class="tip-txt">Three scenarios below, side by side: <strong>Pre Only</strong> (Budapest Before-Stay, no Prague), <strong>Post Only</strong> (no Budapest Before-Stay, Prague After-Stay), and <strong>Both Pre + Post</strong> (the full Celebrity-handled experience). Tap a tab to see that scenario's exact flight dates, airports, hotel needs, and transfers. All options are planned / not yet booked — nothing here should be read as a confirmed reservation.</div></div>
 
-        <div class="card hi" style="margin-bottom:10px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:6px">✈️ Arrival Window — Fly INTO Budapest (BUD)</div>
-          <div style="font-size:12px;color:var(--ts);line-height:1.7">Cruise embarks <strong>Thursday, Aug 19, 2027</strong> in Budapest. Since there's no Budapest Pre-Stay in this plan, arrive with a buffer:<br>
-          <strong>Recommended: arrive Wed, Aug 18, 2027</strong> (the day before) — gives a full buffer against flight delays/cancellations before a hard embarkation deadline.<br>
-          <strong>Absolute latest: Thu, Aug 19, 2027 morning</strong> — risky with only one shot to make check-in (typically similar to Alaska's 10:30 AM-2:30 PM window).<br>
-          <strong>From:</strong> IAD (Washington Dulles) — your usual departure airport.</div>
+        <div class="dntp-tabs">
+          <div class="dntp-tab" id="dntp-btn-pre" onclick="selDnTP('pre')">🇭🇺 Pre Only</div>
+          <div class="dntp-tab" id="dntp-btn-post" onclick="selDnTP('post')">🇨🇿 Post Only</div>
+          <div class="dntp-tab on" id="dntp-btn-both" onclick="selDnTP('both')">⭐ Both Pre + Post</div>
         </div>
 
-        <div class="card hi" style="margin-bottom:14px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:6px">✈️ Departure Window — Fly HOME from Prague (PRG)</div>
-          <div style="font-size:12px;color:var(--ts);line-height:1.7">Post-Stay checkout is <strong>Sunday, Aug 29, 2027</strong> (Day 4 of the Prague After-Stay). Fly home that day — check-out is in the morning, so an afternoon/evening flight gives breathing room.<br>
-          <strong>To:</strong> IAD (Washington Dulles)</div>
+        <div class="card hi" style="margin-bottom:14px;overflow-x:auto">
+          <table class="cmp-table">
+            <tr><td class="cmp-lbl"></td><td class="cmp-hdr">Pre Only</td><td class="cmp-hdr">Post Only</td><td class="cmp-hdr cmp-both-col">⭐ Both</td></tr>
+            <tr><td class="cmp-lbl">USA departure</td><td class="cmp-val">Mon Aug 16</td><td class="cmp-val">Tue Aug 17</td><td class="cmp-val cmp-both-col">Mon Aug 16</td></tr>
+            <tr><td class="cmp-lbl">Europe arrival</td><td class="cmp-val">Tue Aug 17 · BUD</td><td class="cmp-val">Wed Aug 18 · BUD</td><td class="cmp-val cmp-both-col">Tue Aug 17 · BUD</td></tr>
+            <tr><td class="cmp-lbl">Budapest</td><td class="cmp-val">Aug 17–19</td><td class="cmp-val">Aug 18–19 (1 night)</td><td class="cmp-val cmp-both-col">Aug 17–19</td></tr>
+            <tr><td class="cmp-lbl">Cruise</td><td class="cmp-val">Aug 19–26</td><td class="cmp-val">Aug 19–26</td><td class="cmp-val cmp-both-col">Aug 19–26</td></tr>
+            <tr><td class="cmp-lbl">Prague</td><td class="cmp-val">—</td><td class="cmp-val">Aug 26–29</td><td class="cmp-val cmp-both-col">Aug 26–29</td></tr>
+            <tr><td class="cmp-lbl">Fly home</td><td class="cmp-val">⚠️ TBD airport</td><td class="cmp-val">Sun Aug 29 · PRG</td><td class="cmp-val cmp-both-col">Sun Aug 29 · PRG</td></tr>
+            <tr><td class="cmp-lbl">Celebrity pre-package</td><td class="cmp-val">✅ Yes</td><td class="cmp-val">❌ No</td><td class="cmp-val cmp-both-col">✅ Yes</td></tr>
+            <tr><td class="cmp-lbl">Celebrity post-package</td><td class="cmp-val">❌ No</td><td class="cmp-val">✅ Yes</td><td class="cmp-val cmp-both-col">✅ Yes</td></tr>
+          </table>
         </div>
 
-        <div class="tip-box" style="border-color:#f59e0b;background:rgba(245,158,11,.08)"><div class="tip-lbl" style="color:#92400e">⏱️ Flight Times — No Direct Flights Exist on Either Route</div><div class="tip-txt">Worth knowing before you search: <strong>there are no nonstop flights from IAD to Budapest, and none from Prague to IAD either</strong> — every option requires at least one connection.<br><br>
-        <strong>One interesting fact:</strong> Austrian Airlines flies IAD → Vienna <em>nonstop</em> (8h 15m) — Vienna isn't your destination, but it's worth knowing this exists if a Budapest routing through Vienna ever looks appealing.<br><br>
-        <strong>If a direct flight existed</strong> (it doesn't, this is just for reference): based on distance, IAD→BUD would be roughly <strong>8h 15-30m</strong> nonstop (almost identical to the confirmed Austrian IAD→Vienna time, since Budapest and Vienna are only ~250 km apart), and PRG→IAD would be roughly <strong>7h 50m-8h</strong>. So the real one-stop options above are adding roughly <strong>3.5-4.5 hours</strong> on top of the theoretical direct time once realistic layovers are factored in — that's the actual cost of the required connection.<br><br>
-        Since a stop is unavoidable either way, prioritize a <strong>short, familiar connecting hub</strong> (Frankfurt, Amsterdam, Vienna) over total flight count — a well-timed 1-stop often beats a technically-fewer-stops option with a long layover.</div></div>
+        <!-- ============ PRE ONLY ============ -->
+        <div class="dntp-panel" id="dntp-pre">
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px">Budapest Before-Stay Only</div>
+          <div class="tip-box"><div class="tip-txt">Celebrity 2-Night Budapest Before-Stay + Celebrity Compass cruise. <strong>No Prague After-Stay</strong> — you'll need your own onward travel from Vilshofen.</div></div>
 
-        <div class="card hi" style="margin-bottom:10px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:6px">✈️ IAD → BUD — Segment-by-Segment (realistic, ~12-12.5 hrs total)</div>
-          <div style="font-size:12px;color:var(--ts);line-height:1.8">
-          <strong>Via Amsterdam (KLM):</strong> IAD→AMS ~7h 45m, layover ~1.5-2.5h, AMS→BUD ~2h<br>
-          <strong>Via Frankfurt (Lufthansa):</strong> IAD→FRA ~7h 50m, layover ~1.5-2h, FRA→BUD ~1h 35m<br>
-          <strong>Via Vienna (Austrian):</strong> IAD→VIE nonstop 8h 15m, then a short VIE→BUD hop ~50 min — but still needs ~1.5-2h layover in Vienna to clear immigration and change terminals, so this doesn't actually save much time overall despite the nonstop first leg
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Mon Aug 16, 2027</div><div class="flow-title">✈️ Depart Washington Dulles (IAD)</div>
+            <div class="flow-desc">Overnight international flight to Budapest (BUD).</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Tue Aug 17</div><div class="flow-title">🇭🇺 Arrive Budapest (BUD)</div>
+            <div class="flow-desc">Begin Celebrity 2-night Budapest Before-Stay. Working assumption: Kempinski Hotel Budapest — Premium (see Pre-Stay tab for full hotel details).</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Wed Aug 18</div><div class="flow-title">🇭🇺 Budapest Before-Stay</div>
+            <div class="flow-desc">Celebrity package activities + free time.</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Thu Aug 19</div><div class="flow-title">🇭🇺 Budapest → Celebrity Compass</div>
+            <div class="flow-desc">Celebrity handles the hotel-to-ship transfer. Embark Celebrity Compass.</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Aug 19–26</div><div class="flow-title">🚢 Celebrity Compass — Budapest → Vilshofen</div>
+            <div class="flow-desc">Vista Balcony Suite 215, reservation 2474293.</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body a">
+            <div class="flow-date">Thu Aug 26</div><div class="flow-title">🇩🇪 Disembark in Vilshofen</div>
+            <div class="flow-desc">No Prague After-Stay in this scenario, so LVD/EVD need independent transportation to an appropriate departure airport. <strong>Do not assume PRG</strong> — Vilshofen is much closer to Munich (MUC) than to Prague.</div>
+            <div class="flow-tag a">⚠️ Need to arrange independently</div>
+          </div></div>
+
+          <div class="warn-box">⚠️ <strong>NEED TO DETERMINE BEST AIRPORT/TRANSFER.</strong> Return date depends on the answer: <strong>Thu Aug 26</strong> if a practical same-day flight connection is possible after disembarkation/transfer, otherwise <strong>Fri Aug 27</strong> with an overnight stay near the selected departure airport. This is a research/decision item — comparing the most practical airport options from Vilshofen — not a confirmed plan.</div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🔎 Flight Search</div>
+          <div class="rc"><div class="rc-name">Outbound: IAD → BUD</div><div class="rc-type">Depart Mon, Aug 16, 2027 · arrive Tue, Aug 17 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3AIAD%2Cto%3ABUD%2Cdeparture%3A8%2F16%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
+          <div class="rc" style="border-color:#f59e0b"><div class="rc-name">Return: TBD airport → IAD</div><div class="rc-type">Aug 26 or Aug 27, depending on transfer/flight logistics</div><div class="rc-desc">Not searchable yet — departure airport hasn't been determined. Compare Munich (MUC) and other practical options from Vilshofen before searching.</div></div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🚕 Ground Transportation</div>
+          <div class="card hi" style="margin-bottom:14px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇭🇺 Budapest Airport (BUD) → Hotel</div>
+            <div style="font-size:12px;color:var(--ts);line-height:1.7">
+            ~16-24 km from the center, ~30-40 min depending on option.<br><br>
+            <strong>Best for comfort/no hassle:</strong> Bolt (the local Uber-equivalent) — reliable, avoids the taxi-scam risk.<br>
+            <strong>Official airport taxi:</strong> Főtaxi — fixed metered rate, roughly <strong>9,800-11,000 HUF (~$28-32)</strong>, ~35 min.<br>
+            <strong>Cheapest:</strong> Bus 100E Airport Express — direct to Deák Ferenc tér, ~40 min, <strong>~2,200-2,500 HUF (~$6-7)</strong>.
+            </div>
           </div>
+          <div class="warn-box">⚠️ Vilshofen → departure airport ground transportation is TBD until the airport itself is decided.</div>
+
+          <div class="tip-box"><div class="tip-lbl">📝 Still to decide/confirm</div><div class="tip-txt">
+            • ⚠️ Best departure airport/transfer option from Vilshofen (Munich MUC likely, others TBD)<br>
+            • Same-day Aug 26 departure vs. Aug 27 with an overnight stay near the airport<br>
+            • Points vs. cash for the outbound leg (see Points Strategy)<br>
+            • Seat selection / upgrade options once booked
+          </div></div>
         </div>
-        <div class="card hi" style="margin-bottom:14px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:6px">✈️ PRG → IAD — Segment-by-Segment (realistic, ~11.5-12 hrs total)</div>
-          <div style="font-size:12px;color:var(--ts);line-height:1.8">
-          <strong>Via Reykjavik (Icelandair) — shortest overall:</strong> PRG→KEF ~3h 40m, layover ~1.5-2h, KEF→IAD ~5h 30m<br>
-          <strong>Via Amsterdam (KLM):</strong> PRG→AMS ~1h 35m, layover ~1.5-2.5h, AMS→IAD ~9h 15m<br>
-          <strong>Via Frankfurt (Lufthansa):</strong> PRG→FRA ~1h, layover ~1.5-2h, FRA→IAD ~9h 30m
+
+        <!-- ============ POST ONLY ============ -->
+        <div class="dntp-panel" id="dntp-post">
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px">Prague After-Stay Only</div>
+          <div class="tip-box"><div class="tip-txt">Independent Budapest arrival + Celebrity Compass cruise + Celebrity 3-night Prague After-Stay. <strong>No Budapest Before-Stay</strong> — you'll need a one-night independent hotel before embarkation.</div></div>
+
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Tue Aug 17, 2027</div><div class="flow-title">✈️ Depart Washington Dulles (IAD)</div>
+            <div class="flow-desc">Overnight international flight to Budapest (BUD).</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body a">
+            <div class="flow-date">Wed Aug 18</div><div class="flow-title">🇭🇺 Arrive Budapest (BUD)</div>
+            <div class="flow-desc">This is <strong>not</strong> part of the Celebrity Before-Stay package. LVD/EVD need an independent Budapest hotel for one night, plus airport-to-hotel transportation.</div>
+            <div class="flow-tag a">⚠️ Hotel TBD · Airport transfer TBD</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body a">
+            <div class="flow-date">Thu Aug 19</div><div class="flow-title">🇭🇺 Budapest → Celebrity Compass</div>
+            <div class="flow-desc">Independent transfer from hotel to the Celebrity Compass embarkation location, unless Celebrity documentation provides another arrangement. Embark Celebrity Compass.</div>
+            <div class="flow-tag a">⚠️ Arrange independently</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Aug 19–26</div><div class="flow-title">🚢 Celebrity Compass — Budapest → Vilshofen</div>
+            <div class="flow-desc">Vista Balcony Suite 215, reservation 2474293.</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Thu Aug 26</div><div class="flow-title">🇩🇪 Vilshofen → 🇨🇿 Prague</div>
+            <div class="flow-desc">Begin Celebrity Prague After-Stay. Celebrity handles the post-cruise transfer, including the planned Český Krumlov stop en route. Arrive Prague — Night 1. Working assumption: Mandarin Oriental Prague — Ultra Premium (see Post-Stay tab for full hotel details).</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Fri Aug 27</div><div class="flow-title">🇨🇿 Prague After-Stay — Night 2</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Sat Aug 28</div><div class="flow-title">🇨🇿 Prague After-Stay — Night 3</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Sun Aug 29</div><div class="flow-title">✈️ Check out and depart Prague</div>
+            <div class="flow-desc">Prague Václav Havel Airport (PRG) → Washington Dulles (IAD).</div>
+          </div></div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🔎 Flight Search — Search as Open-Jaw / Multi-City</div>
+          <div class="tip-box"><div class="tip-txt">Filtered to: United (UA), Lufthansa (LH), Austrian (OS), SWISS (LX) — Star Alliance/United — plus Air France (AF), KLM (KL), British Airways (BA), Iberia (IB) — Chase transfer partners.</div></div>
+          <div class="rc"><div class="rc-name">Outbound: IAD → BUD</div><div class="rc-type">Depart Tue, Aug 17, 2027 · arrive Wed, Aug 18 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3AIAD%2Cto%3ABUD%2Cdeparture%3A8%2F17%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
+          <div class="rc"><div class="rc-name">Return: PRG → IAD</div><div class="rc-type">Depart Sun, Aug 29, 2027 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3APRG%2Cto%3AIAD%2Cdeparture%3A8%2F29%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
+
+          <div class="tip-box" style="border-color:#f59e0b;background:rgba(245,158,11,.08)"><div class="tip-lbl" style="color:#92400e">⏱️ Flight Times — No Direct Flights Exist on Either Route</div><div class="tip-txt">No nonstop flights from IAD to Budapest, and none from Prague to IAD — every option requires at least one connection. <strong>IAD→BUD via Amsterdam/Frankfurt/Vienna:</strong> ~12-12.5 hrs total with layover. <strong>PRG→IAD via Reykjavik (shortest), Amsterdam, or Frankfurt:</strong> ~11.5-12 hrs total.</div></div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🚕 Ground Transportation — Both Ends</div>
+          <div class="card hi" style="margin-bottom:10px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇭🇺 Budapest Airport (BUD) → Independent Hotel</div>
+            <div style="font-size:12px;color:var(--ts);line-height:1.7">
+            ~16-24 km from the center, ~30-40 min. Best for comfort: Bolt. Official taxi: Főtaxi, ~9,800-11,000 HUF (~$28-32). Cheapest: Bus 100E, ~2,200-2,500 HUF (~$6-7).
+            </div>
+            <div class="flow-tag a" style="margin-top:8px">⚠️ Arrange independently</div>
           </div>
-          <div style="font-size:11px;color:var(--tm);margin-top:6px">Note: PRG→IAD clears US immigration/customs on arrival at IAD itself (not at the connecting hub), so the connecting-hub layover here is purely Schengen-to-Schengen — genuinely can run closer to 1-1.5h at a well-organized airport, unlike the outbound direction.</div>
-        </div>
-        <div class="tip-box" style="border-color:#f59e0b;background:rgba(245,158,11,.08)"><div class="tip-txt">🛂 <strong>Why layovers run long westbound-into-Europe:</strong> flying IAD→(hub)→BUD means clearing EU immigration/passport control at the FIRST European stop, before your connecting flight — that's on top of normal gate-to-gate walking time, and at a big hub like Amsterdam or Frankfurt it realistically eats 45-90 min by itself. 1-1.5h total layover is the airline's bare minimum booking window, not a comfortable real-world buffer — 1.5-2.5h is the honest range once you factor in a slow immigration line or a delayed inbound flight.</div></div>
-          <div style="font-size:11px;color:var(--tm);margin-top:6px">These are typical scheduled block times for common routings — actual figures shift by exact date/carrier, but this gives a realistic sense of what each option feels like.</div>
-        </div>
-
-        <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px">🔎 Search Links — Pre-filtered to United + Chase Transfer Partners</div>
-        <div class="tip-box"><div class="tip-txt">Filtered to: United (UA), Lufthansa (LH), Austrian (OS), SWISS (LX) — Star Alliance/United — plus Air France (AF), KLM (KL), British Airways (BA), Iberia (IB) — Chase transfer partners. <strong>Once results load: sort/filter by shortest total travel time</strong> — no nonstop option exists on either route (see the flight-time note above), so aim for the shortest single-connection itinerary rather than "direct" (Expedia's stop filter isn't reliably linkable, so apply it on the results page).</div></div>
-        <div class="rc"><div class="rc-name">Outbound: IAD → BUD</div><div class="rc-type">Depart Wed, Aug 18, 2027 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3AIAD%2Cto%3ABUD%2Cdeparture%3A8%2F18%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
-        <div class="rc"><div class="rc-name">Return: PRG → IAD</div><div class="rc-type">Depart Sun, Aug 29, 2027 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3APRG%2Cto%3AIAD%2Cdeparture%3A8%2F29%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
-
-        <div class="tip-box" style="border-color:#0891b2;background:rgba(8,145,178,.08)"><div class="tip-lbl" style="color:#0e7490">💡 Why these airlines</div><div class="tip-txt"><strong>United (UA)</strong> — your home carrier, redeemable with direct United miles <em>or now Chase Ultimate Rewards transfers (1:1, newly added)</em>. <strong>Lufthansa/Austrian/SWISS</strong> — Star Alliance partners, also bookable with United miles, and Austrian/Lufthansa have strong direct routes into Central Europe. <strong>Air France/KLM</strong> and <strong>British Airways/Iberia</strong> — bookable with Chase <em>or Amex</em> transfers (Flying Blue and Avios). See the Flights & Points Strategy note on the <strong>Points Strategy tab</strong> for the full points approach — don't transfer anything until fares/award space are visible, expected ~Sept 2026.</div></div>
-
-        <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🚕 Ground Transportation — Both Ends</div>
-
-        <div class="card hi" style="margin-bottom:10px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇭🇺 Budapest Airport (BUD) → Ship / City</div>
-          <div style="font-size:12px;color:var(--ts);line-height:1.7">
-          ~16 km / 24 km road route from the center, ~30-40 min depending on option.<br><br>
-          <strong>Best for comfort/no hassle:</strong> Bolt (the local Uber-equivalent) — reliable, avoids the taxi-scam risk, similar or cheaper than the official taxi. Recommended over hailing a street taxi.<br>
-          <strong>Official airport taxi:</strong> Főtaxi — the only authorized airport taxi company, bright yellow cars queued right outside Arrivals. Fixed metered rate (~1,000 HUF pickup + 400 HUF/km), roughly <strong>9,800-11,000 HUF (~$28-32)</strong> to the center, ~35 min. Safe and legitimate if you'd rather queue than use an app.<br>
-          <strong>Cheapest:</strong> Bus 100E Airport Express — direct to Deák Ferenc tér downtown, 24/7, ~40 min, <strong>~2,200-2,500 HUF (~$6-7)</strong>. Needs its own dedicated ticket (not a standard transit ticket) — buy from the machine at the bus stop or via the BudapestGO app before boarding.<br><br>
-          <strong>Avoid:</strong> unlicensed taxis hailing you inside the arrivals hall — a known scam target for tourists.
+          <div class="card hi" style="margin-bottom:14px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇨🇿 Prague Hotel → PRG Airport (Departure Day)</div>
+            <div style="font-size:12px;color:var(--ts);line-height:1.7">
+            ~17 km from the center, ~25-45 min. Best for comfort: Bolt or Uber. Pre-booked private transfer: €20-35, 25-30 min door-to-door — worth booking ahead for zero friction on departure day. Cheapest: Bus 119 + Metro Line A, ~32-40 CZK (~$1.30-2).
+            </div>
           </div>
+
+          <div class="tip-box"><div class="tip-lbl">📝 Still to decide/confirm</div><div class="tip-txt">
+            • ⚠️ Budapest independent hotel (1 night, Aug 18) and BUD airport transfer<br>
+            • ⚠️ Confirm whether Celebrity has an alternate embarkation-day transfer arrangement<br>
+            • Direct vs. 1-stop once real options are visible (~Sept 2026)<br>
+            • Points vs. cash per leg (see Points Strategy)
+          </div></div>
         </div>
 
-        <div class="card hi" style="margin-bottom:14px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇨🇿 Prague Airport (PRG) → Marriott / City</div>
-          <div style="font-size:12px;color:var(--ts);line-height:1.7">
-          ~17 km from the center, ~25-45 min depending on option and traffic.<br><br>
-          <strong>Best for comfort/no hassle:</strong> Bolt or Uber — both operate reliably at PRG as of 2026, no dedicated pickup point at the terminal but drivers meet you at a nearby designated area. Works especially well for two people.<br>
-          <strong>Pre-booked private transfer:</strong> Fixed price, driver meets you at arrivals with a name sign, no negotiation — <strong>€20-35</strong>, 25-30 min door-to-door. The easiest option with luggage, worth booking ahead if you want zero friction after a long flight.<br>
-          <strong>Cheapest:</strong> Bus 119 + Metro Line A — <strong>~32-40 CZK (~$1.30-2)</strong>, about 35-40 min total. Buy the ticket from the yellow machine at the bus stop (cash or card) — DPP buses/trams don't take card payment on board.<br><br>
-          <strong>Avoid:</strong> unmetered taxis waiting in the arrivals hall — a well-known overcharging risk in Prague specifically; if taking a taxi, only use a pre-booked or app-based one.
+        <!-- ============ BOTH PRE + POST ============ -->
+        <div class="dntp-panel on" id="dntp-both">
+          <div style="display:inline-block;font-size:10px;font-weight:800;color:#15803d;background:rgba(34,197,94,.15);padding:4px 10px;border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">⭐ Recommended / Full Experience</div>
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px">Budapest Before-Stay + Prague After-Stay</div>
+          <div class="tip-box"><div class="tip-txt">Celebrity Budapest 2-night Before-Stay + Celebrity Compass + Celebrity Prague 3-night After-Stay. This is the easiest end-to-end option because <strong>Celebrity handles both major land/cruise transitions.</strong></div></div>
+
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Mon Aug 16, 2027</div><div class="flow-title">✈️ Depart Washington Dulles (IAD)</div>
+            <div class="flow-desc">Overnight international flight to Budapest (BUD).</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Tue Aug 17</div><div class="flow-title">🇭🇺 Arrive Budapest (BUD)</div>
+            <div class="flow-desc">Begin Celebrity Budapest 2-night Before-Stay — Night 1. Working assumption: Kempinski Hotel Budapest — Premium.</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Wed Aug 18</div><div class="flow-title">🇭🇺 Budapest — Before-Stay Night 2</div>
+            <div class="flow-desc">Included activities + free time per the Celebrity package itinerary.</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Thu Aug 19</div><div class="flow-title">🇭🇺 Budapest → Celebrity Compass</div>
+            <div class="flow-desc">Celebrity handles hotel-to-ship transportation. Embark Celebrity Compass.</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Aug 19–26</div><div class="flow-title">🚢 Celebrity Compass — Budapest → Vilshofen</div>
+            <div class="flow-desc">Vista Balcony Suite 215, reservation 2474293.</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Thu Aug 26</div><div class="flow-title">🇩🇪 Vilshofen → 🇨🇿 Prague</div>
+            <div class="flow-desc">Disembark. Begin Celebrity Prague After-Stay. Celebrity handles the transfer toward Prague, including the planned Český Krumlov stop en route. Arrive Prague — Night 1. Working assumption: Mandarin Oriental, Prague — Ultra Premium.</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Fri Aug 27</div><div class="flow-title">🇨🇿 Prague — After-Stay Night 2</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Sat Aug 28</div><div class="flow-title">🇨🇿 Prague — After-Stay Night 3</div>
+            <div class="flow-tag g">✓ Celebrity handles</div>
+          </div></div>
+          <div class="flow-step"><div class="flow-body g">
+            <div class="flow-date">Sun Aug 29</div><div class="flow-title">✈️ Prague → Washington</div>
+            <div class="flow-desc">Prague Václav Havel Airport (PRG) → Washington Dulles (IAD).</div>
+          </div></div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🔎 Flight Search — Search as Open-Jaw / Multi-City</div>
+          <div class="tip-box"><div class="tip-txt">Filtered to: United (UA), Lufthansa (LH), Austrian (OS), SWISS (LX) — Star Alliance/United — plus Air France (AF), KLM (KL), British Airways (BA), Iberia (IB) — Chase transfer partners. Sort/filter results by shortest total travel time — no nonstop option exists on either route.</div></div>
+          <div class="rc"><div class="rc-name">Outbound: IAD → BUD</div><div class="rc-type">Depart Mon, Aug 16, 2027 · arrive Tue, Aug 17 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3AIAD%2Cto%3ABUD%2Cdeparture%3A8%2F16%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
+          <div class="rc"><div class="rc-name">Return: PRG → IAD</div><div class="rc-type">Depart Sun, Aug 29, 2027 · 2 adults</div><a class="rc-lnk" href="https://www.expedia.com/Flights-Search?trip=oneway&amp;leg1=from%3APRG%2Cto%3AIAD%2Cdeparture%3A8%2F29%2F2027TANYT&amp;passengers=adults:2,children:0,infantinlap:N&amp;mode=search&amp;pageId=0&amp;sortOrder=INCREASING&amp;sortType=PRICE&amp;filters=%5B%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22UA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LH%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22OS%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22LX%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22AF%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22KL%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22BA%22%7D%7D%2C%7B%22preferredAirlineFilterValue%22%3A%7B%22carrierCode%22%3A%22IB%22%7D%7D%5D" target="_blank">Search on Expedia ↗</a></div>
+
+          <div class="tip-box" style="border-color:#f59e0b;background:rgba(245,158,11,.08)"><div class="tip-lbl" style="color:#92400e">⏱️ Flight Times — No Direct Flights Exist on Either Route</div><div class="tip-txt">No nonstop flights from IAD to Budapest, and none from Prague to IAD — every option requires at least one connection. <strong>IAD→BUD via Amsterdam/Frankfurt/Vienna:</strong> ~12-12.5 hrs total with layover. <strong>PRG→IAD via Reykjavik (shortest), Amsterdam, or Frankfurt:</strong> ~11.5-12 hrs total. Austrian flies IAD→Vienna nonstop (8h 15m) for reference, though Vienna isn't the destination.</div></div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">💡 Why These Airlines</div>
+          <div class="tip-box" style="border-color:#0891b2;background:rgba(8,145,178,.08)"><div class="tip-txt"><strong>United (UA)</strong> — your home carrier, redeemable with direct United miles or Chase Ultimate Rewards transfers (1:1, newly added). <strong>Lufthansa/Austrian/SWISS</strong> — Star Alliance partners, also bookable with United miles. <strong>Air France/KLM</strong> and <strong>British Airways/Iberia</strong> — bookable with Chase or Amex transfers (Flying Blue and Avios). See the Points Strategy tab for the full approach — don't transfer anything until fares/award space are visible, expected ~Sept 2026.</div></div>
+
+          <div style="font-size:11px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px">🚕 Ground Transportation — Both Ends</div>
+          <div class="card hi" style="margin-bottom:10px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇭🇺 Budapest Airport (BUD) → Kempinski / City</div>
+            <div style="font-size:12px;color:var(--ts);line-height:1.7">
+            ~16-24 km from the center, ~30-40 min depending on option. Best for comfort: Bolt. Official taxi: Főtaxi, ~9,800-11,000 HUF (~$28-32). Cheapest: Bus 100E Airport Express, ~2,200-2,500 HUF (~$6-7).
+            </div>
+            <div class="flow-tag g" style="margin-top:8px">✓ Confirm if included in Celebrity Before-Stay package</div>
           </div>
-        </div>
+          <div class="card hi" style="margin-bottom:14px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:6px">🇨🇿 Prague Hotel → PRG Airport (Departure Day)</div>
+            <div style="font-size:12px;color:var(--ts);line-height:1.7">
+            ~17 km from the center, ~25-45 min. Best for comfort: Bolt or Uber. Pre-booked private transfer: €20-35, 25-30 min door-to-door. Cheapest: Bus 119 + Metro Line A, ~32-40 CZK (~$1.30-2).
+            </div>
+          </div>
 
-        <div class="tip-box"><div class="tip-lbl">📝 Still to decide/confirm</div><div class="tip-txt">
-          • Direct vs. 1-stop once real options are visible (~Sept 2026 when airline schedules publish)<br>
-          • Points vs. cash per leg (see Points Strategy)<br>
-          • Whether to add an extra buffer night in Budapest before embarkation<br>
-          • Seat selection / upgrade options once booked
-        </div></div>
+          <div class="tip-box"><div class="tip-lbl">📝 Still to decide/confirm</div><div class="tip-txt">
+            • Direct vs. 1-stop once real options are visible (~Sept 2026 when airline schedules publish)<br>
+            • Points vs. cash per leg (see Points Strategy)<br>
+            • Confirm whether BUD airport → Kempinski transfer is included in the Celebrity Before-Stay package<br>
+            • Seat selection / upgrade options once booked
+          </div></div>
+        </div>
       </div>
     </div>
     <div class="panel" id="dn-cruise">
@@ -2355,6 +2530,13 @@ function jumpToPort(portSlug){
 }
 function lvP(id,btn){sP('lv',id,btn,'vegas');}
 function dnP(id,btn){sP('dn',id,btn,'danube');}
+function selDnTP(tab){
+  ['pre','post','both'].forEach(function(t){
+    var p=document.getElementById('dntp-'+t), b=document.getElementById('dntp-btn-'+t);
+    if(p)p.classList.toggle('on',t===tab);
+    if(b)b.classList.toggle('on',t===tab);
+  });
+}
 function sP(p,id,btn,trip){
   document.querySelectorAll('#trip-'+trip+' .panel').forEach(x=>x.classList.remove('on'));
   document.querySelectorAll('#'+p+'-nav .nb').forEach(x=>x.classList.remove('on'));
