@@ -2937,6 +2937,9 @@ var DANUBE_DAYS = [
   if (!lvdGet('lvd_data_outfit_lv_lvd_0_1', null)) {
     lvdSet('lvd_data_outfit_lv_lvd_0_1', {val:'Black outfit', shoe:'', note:''});
   }
+  if (!lvdGet('lvd_data_points_united', null)) {
+    lvdSet('lvd_data_points_united', {balance:'541338', notes:'+ 340 PlusPoints · Premier 1K, Star Alliance Gold, Club cardmember, member since Apr 2018', updated:'Sep 3, 2026'});
+  }
   if (!lvdGet('lvd_data_points_royalone', null)) {
     lvdSet('lvd_data_points_royalone', {balance:'43969', notes:'From Bank of America portal', updated:'Jul 25, 2026'});
   }
@@ -4449,6 +4452,7 @@ var FIGHT_CARD = {"event": "UFC 329 · McGregor vs. Holloway 2", "date": "Saturd
 
 // ── POINTS BALANCE TRACKER ──
 var POINTS_PROGRAMS = [
+  {key: 'united', label: 'United MileagePlus', icon: '🔵', color: '#003876'},
   {key: 'royalone', label: 'Royal ONE (Bank of America)', icon: '🟣', color: '#4c1d95'},
   {key: 'amex', label: 'Amex Membership Rewards', icon: '💳', color: '#b76e79'},
   {key: 'chase', label: 'Chase Ultimate Rewards', icon: '🟦', color: '#0a2f6b'},
