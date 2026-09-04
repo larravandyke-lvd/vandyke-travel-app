@@ -4,12 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Van Dyke Travel</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232ba89a'/><path fill='white' transform='scale(0.0625)' d='M 256 70 C 275 70 290 95 290 130 L 290 195 L 410 260 L 410 295 L 290 255 L 290 330 L 335 365 L 335 395 L 256 375 L 177 395 L 177 365 L 222 330 L 222 255 L 102 295 L 102 260 L 222 195 L 222 130 C 222 95 237 70 256 70 Z'/></svg>">
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Travel">
-<meta name="theme-color" content="#2ba89a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230ABAB5'/><text x='9' y='22' font-size='13' font-family='Georgia,serif' fill='white' font-style='italic'>L</text><text x='18' y='22' font-size='13' font-family='Georgia,serif' fill='%23FFD700' font-style='italic'>E</text></svg>">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;background:#f0f9f9;color:#1a2e2e;transition:background .4s}
@@ -451,7 +446,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
 <div id="main-app" style="display:block">
 <div class="app">
   <div class="hdr">
-    <a href="https://portals-gateway.vercel.app" style="position:absolute;top:14px;left:14px;font-size:12px;font-weight:700;color:#2ba89a;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:Georgia,serif" title="Back to Portal Menu"><svg width="18" height="18" viewBox="0 0 64 64"><defs><linearGradient id="pmg1" x1="4" y1="2" x2="60" y2="62" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f6e3b4"/><stop offset=".5" stop-color="#c9a24b"/><stop offset="1" stop-color="#7a5a35"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#pmg1)"/><circle cx="32" cy="32" r="26" fill="none" stroke="#1b1207" stroke-opacity=".28" stroke-width="1.5"/><text x="32" y="43" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="30" fill="#1b1207" text-anchor="middle">V</text></svg>Portal Menu</a>
+    <a href="https://portals-gateway.vercel.app" style="position:absolute;top:14px;left:14px;font-size:11px;font-weight:700;color:var(--ac);text-decoration:none;display:flex;align-items:center;gap:3px" title="Back to Portals Homepage">🔗 Portals Homepage</a>
     <div class="hdr-icon"><div class="hdr-le">V<span style="color:#FFD700">D</span></div></div>
     <div class="hdr-title">Van Dyke Travel</div>
     <div class="hdr-sub">Larra & Eric · Personal Travel Dashboard</div>
@@ -463,7 +458,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
     <div class="tp" id="pill-alaska" data-end="2026-08-21" onclick="switchTrip('alaska')">🚢 Alaska · Aug 2026</div>
     <div class="tp" id="pill-danube" data-end="2027-08-26" onclick="switchTrip('danube')">🏰 River Cruise · Aug 2027</div>
     <div class="tp past-pill" id="pill-past" onclick="switchTrip('past')">📦 Past Trips</div>
-
+    <div class="tp" style="background:var(--acb);border-color:var(--b);color:var(--ac)" onclick="openPortalsPanel()">🔗 Portals</div>
   </div>
 
   <div id="portalsOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:950" onclick="if(event.target===this)closePortalsPanel()">
@@ -2623,7 +2618,7 @@ function copyAddr(text,el){
 }
 // ── Other Portals panel (Points, Estate, AI, Home gateway) ──
 var PORTAL_TILES_IDX = [
-  {id:'home', icon:'🏠', name:'Portal Menu', desc:'The shared gateway — one PIN, links to everything.'},
+  {id:'home', icon:'🏠', name:'Portals Homepage', desc:'The shared gateway — one PIN, links to everything.'},
   {id:'points', icon:'💳', name:'Points', desc:'Cards, balances, specials, redemption strategy.'},
   {id:'estate', icon:'🏛️', name:'Estate', desc:'Estate planning & documents.'},
   {id:'ai', icon:'📈', name:'AI', desc:'Your AI workspace.'}
