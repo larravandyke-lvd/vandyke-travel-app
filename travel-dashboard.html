@@ -371,6 +371,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
 
 /* ── TRIP THEMES ── */
 body.vegas{background:#f5f0ff;color:#1a0533;--ac:#6c3aed;--acl:#9b6dff;--acb:#ede8ff;--b:#c4b5fd;--bs:#a78bfa;--cb:white;--hb:linear-gradient(135deg,#4c1d95,#2d0a6b);--ts:#5b3a8a;--tm:#b39ddb;--text:#1a0533}
+body.vegas2{background:#fff8ed;color:#3d2508;--ac:#b45309;--acl:#d97706;--acb:#fef3e0;--b:#fbd9a5;--bs:#f0b866;--cb:white;--hb:linear-gradient(135deg,#92400e,#451a03);--ts:#92601d;--tm:#c99a5b;--text:#3d2508}
 body.alaska{background:#edfafa;color:#042e2d;--ac:#0ABAB5;--acl:#06d6d0;--acb:#e0fafa;--b:#a0e8e6;--bs:#5dd8d5;--cb:white;--hb:linear-gradient(135deg,#0a9e9a,#076e6b);--ts:#156e6b;--tm:#7dd4d2;--text:#042e2d}
 body.danube{background:#fdf2f4;color:#3d0d18;--ac:#9c2042;--acl:#c2304f;--acb:#fdeef1;--b:#e8b8c4;--bs:#d4849a;--cb:white;--hb:linear-gradient(135deg,#7a1635,#4a0e20);--ts:#7a2d3f;--tm:#d4a0ad;--text:#3d0d18}
 body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f5f9;--b:#cbd5e1;--bs:#94a3b8;--cb:white;--hb:linear-gradient(135deg,#374151,#1f2937);--ts:#475569;--tm:#94a3b8;--text:#1e293b}
@@ -456,6 +457,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
   <div class="tsel">
     <div class="tp" id="pill-vegas" data-end="2026-07-12" onclick="switchTrip('vegas')" style="display:none">✓ Las Vegas · Jul 2026 (Complete)</div>
     <div class="tp" id="pill-alaska" data-end="2026-08-21" onclick="switchTrip('alaska')">🚢 Alaska · Aug 2026</div>
+    <div class="tp" id="pill-vegas2" data-end="2026-11-16" onclick="switchTrip('vegas2')">🦅 Vegas · Nov 2026</div>
     <div class="tp" id="pill-danube" data-end="2027-08-26" onclick="switchTrip('danube')">🏰 River Cruise · Aug 2027</div>
     <div class="tp past-pill" id="pill-past" onclick="switchTrip('past')">📦 Past Trips</div>
     <div class="tp" style="background:var(--acb);border-color:var(--b);color:var(--ac)" onclick="openPortalsPanel()">🔗 Portals</div>
@@ -836,6 +838,113 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
       <div id="lv-memory-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
     </div>
   </div><!-- /vegas -->
+
+  <!-- VEGAS 2 (Eagles at Sphere, Nov 2026) -->
+  <div id="trip-vegas2" style="display:none">
+    <div class="hero">
+      <div class="h-eye">Eagles Live in Concert at Sphere 🦅</div>
+      <div class="h-name">Las Vegas <span>Nov 2026</span></div>
+      <div class="h-sub">Likely Thu Nov 12 – Sun Nov 15, 2026 (flexible) · Hotel & flights TBD</div>
+      <div class="cdr">
+        <div class="cd"><div class="cdn" id="ev-d">—</div><div class="cdl">Days</div></div>
+        <div class="cd"><div class="cdn" id="ev-h">—</div><div class="cdl">Hours</div></div>
+        <div class="cd"><div class="cdn" id="ev-m">—</div><div class="cdl">Min</div></div>
+      </div>
+      <div class="htags">
+        <div class="htag">🦅 Eagles · Sphere · Fri Nov 13 & Sat Nov 14</div>
+        <div class="htag">✈️ First class, nonstop, on points — IAD/DCA/BWI</div>
+        <div class="htag">🗓️ Dates flexible for the best points/hotel deal</div>
+        <div class="htag">🏨 Hotel: open decision</div>
+        <div class="htag">🎭 Absinthe show — queued</div>
+      </div>
+    </div>
+    <div class="nav" id="ev-nav">
+      <div class="nb on" onclick="evP('overview',this)"><div class="nb-i">📋</div><div class="nb-l">Overview</div></div>
+      <div class="nb" onclick="evP('show',this)"><div class="nb-i">🦅</div><div class="nb-l">Eagles Show</div></div>
+      <div class="nb" onclick="evP('flights',this)"><div class="nb-i">✈️</div><div class="nb-l">Points & Flights</div></div>
+      <div class="nb" onclick="evP('hotel',this)"><div class="nb-i">🏨</div><div class="nb-l">Hotel</div></div>
+      <div class="nb" onclick="evP('dining',this)"><div class="nb-i">🍽</div><div class="nb-l">Dining</div></div>
+      <div class="nb" onclick="evP('nightlife',this)"><div class="nb-i">🥃</div><div class="nb-l">Speakeasies</div></div>
+      <div class="nb" onclick="evP('notes',this)"><div class="nb-i">📝</div><div class="nb-l">Notes & To-Dos</div></div>
+      <div class="nb" onclick="evP('resources',this)"><div class="nb-i">🔗</div><div class="nb-l">Resources</div></div>
+    </div>
+
+    <div class="panel on" id="ev-overview">
+      <div class="sec"><div class="sh"><div class="st">📋 What We Know So Far</div></div>
+        <div class="tip-box"><div class="tip-lbl">🦅 The trigger</div><div class="tip-txt">Eagles are playing Sphere <strong>Friday Nov 13 and Saturday Nov 14, 2026</strong> — added as part of their extended fall residency. Likely trip: <strong>Thu Nov 12 – Sun Nov 15, 2026</strong> — but flexible on exact travel days if shifting a day either way gets better award space or hotel rates.</div></div>
+        <div class="rc"><div class="rc-name">✈️ Flights</div><div class="rc-desc">Want first class, nonstop, on points. Flying out of any DC-area airport (IAD, DCA, or BWI) — flexible on this if it means a better redemption. See Points & Flights tab.</div></div>
+        <div class="rc"><div class="rc-name">🏨 Hotel</div><div class="rc-desc">Open decision — nothing booked yet. Wynn was home base in July; worth comparing against other options this time.</div></div>
+        <div class="rc"><div class="rc-name">🎫 Eagles Tickets</div><div class="rc-desc">Not yet purchased — need to decide Fri Nov 13 vs Sat Nov 14 (or both) before booking flights/hotel around it.</div></div>
+        <div class="rc"><div class="rc-name">🎭 Absinthe Show</div><div class="rc-desc">Queued from prior planning notes — not yet booked. Can slot into whichever night isn't the Eagles show.</div></div>
+        <div class="rc"><div class="rc-name">🎒 Packing List</div><div class="rc-desc">Tailored packing list from the July trip is on file (Inspire category items, nighties, bathing suits, cover-ups) — can reuse/adapt once dates are locked.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-show">
+      <div class="sec"><div class="sh"><div class="st">🦅 Eagles · Live in Concert at Sphere</div></div>
+        <div class="card hi">The Eagles added six new fall dates to their record-breaking Sphere residency: Sept 18–19, Nov 13–14, and Nov 27–28, 2026 — bringing their total to 64 shows, the most of any artist at the venue. Their full Sphere run now stretches from Sept 2024 through Jan 2027.</div>
+        <div class="rc"><div class="rc-name">Fri, Nov 13, 2026</div><div class="rc-desc">Option A — kicks the weekend off with the show</div></div>
+        <div class="rc"><div class="rc-name">Sat, Nov 14, 2026</div><div class="rc-desc">Option B — show falls mid-weekend, more buffer on either side</div></div>
+        <div class="tip-box"><div class="tip-lbl">💡 Ticket note</div><div class="tip-txt">Tickets for Sphere shows start around $175 and are handled through Ticketmaster/Eagles.com. Once you pick a night, we can build the full itinerary (flights, hotel, dinner) around it — happy to also pencil in the Absinthe show for the other night.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-flights">
+      <div class="sec"><div class="sh"><div class="st">✈️ Points & Flights — First Class, Nonstop</div></div>
+        <div class="tip-box"><div class="tip-lbl">💰 Eric's balance</div><div class="tip-txt">541,338 United MileagePlus miles + 340 PlusPoints, Premier 1K + Star Alliance Gold. Goal: first class, nonstop, on points — with 541k miles banked, cost isn't the constraint, finding the saver seat is.</div></div>
+        <div class="rc"><div class="rc-name">1. Search a wide date window, not just Thu–Sun</div><div class="rc-desc">Since dates are flexible, use United's flexible-date/calendar search across ~Nov 10–17, 2026 for IAD, DCA, and BWI → LAS nonstop. First-class saver award space is limited and can appear on some days and not others in the same week — widening the search is the actual lever for getting first class nonstop, more than which specific airport.</div></div>
+        <div class="rc"><div class="rc-name">2. Book the First Class saver award directly on United metal</div><div class="rc-desc">All three DC airports have nonstop United service to LAS. Domestic first-class saver awards are dynamically priced (no fixed chart) but typically land well within reach of a 541k-mile balance. Booking First directly — rather than an economy award plus upgrade — locks in the seat at booking instead of waitlisting.</div></div>
+        <div class="rc"><div class="rc-name">3. Backup: economy Saver award + PlusPoints upgrade</div><div class="rc-desc">If First saver space isn't showing on the days you want, book the cheapest economy saver award and request a PlusPoints upgrade — domestic short-haul upgrades run ~40 PlusPoints per direction (~80 round-trip), well within Eric's 340. As a 1K, this is a real backup path, not just a consolation prize — TPG specifically flags PlusPoints upgrades as the go-to when saver space in the cabin you want isn't available.</div></div>
+        <div class="rc"><div class="rc-name">4. Let the hotel rate help pick the exact day</div><div class="rc-desc">Since both flights and hotel are flexible, worth comparing Vegas hotel rates across the same Nov 10–17 window — Eagles-residency weekends can spike Strip rates on the show nights themselves, so shifting arrival/departure by a day could save meaningfully on the room even if the flight award price is similar.</div></div>
+        <div class="tip-box"><div class="tip-lbl">⏭️ Next step</div><div class="tip-txt">Search United's saver calendar (IAD/DCA/BWI → LAS, First cabin) across Nov 10–17, 2026, logged in as Eric, and compare against hotel rates for the same window before locking specific flight days.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-hotel">
+      <div class="sec"><div class="sh"><div class="st">🏨 Hotel — Open Decision</div></div>
+        <div class="tip-box"><div class="tip-lbl">Nothing booked yet</div><div class="tip-txt">Wynn Las Vegas was home base for the July trip (Resort King, Wynn Tower) — walkable to Sphere via the Venetian/Palazzo indoor route. Worth deciding whether to return to Wynn or try somewhere new, especially since the Eagles residency draws heavy crowds right around Sphere that weekend.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-dining">
+      <div class="sec"><div class="sh"><div class="st">🍽 Dining — Carried Over From July</div></div>
+        <div class="tip-box"><div class="tip-lbl">Starting point</div><div class="tip-txt">These were favorites from the July trip — good candidates to rebook or use as inspiration for something new this time.</div></div>
+        <div class="rc"><div class="rc-name">SW Steakhouse 🥩</div><div class="rc-type">Wynn signature steakhouse · Lake view</div><div class="rc-desc">One of the most acclaimed steakhouses in Vegas. Chef's tasting menu available — call ahead.</div></div>
+        <div class="rc"><div class="rc-name">Craftsteak 🍖</div><div class="rc-type">Tom Colicchio · A5 Kobe · MGM Grand</div><div class="rc-desc">Certified A5 Kobe beef, shellfish platters, Champagne to open.</div></div>
+        <div class="rc"><div class="rc-name">Morimoto Las Vegas 🍣</div><div class="rc-type">Iron Chef · Omakase-style · MGM Grand</div><div class="rc-desc">Sophisticated Japanese with luxury ingredients.</div></div>
+        <div class="rc"><div class="rc-name">Luchini Restaurant 🍝</div><div class="rc-type">Modern Italian · MGM Grand</div><div class="rc-desc">MGM Grand's modern Italian spot — the current finale stop on the Lip Smacking tour.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-nightlife">
+      <div class="sec"><div class="sh"><div class="st">🥃 Speakeasies — Carried Over From July</div></div>
+        <div class="rc"><div class="rc-name">Employees Only Las Vegas ⭐</div><div class="rc-type">Inside The Cosmopolitan · Top pick</div><div class="rc-desc">James Beard cocktails, hidden entrance, late-night kitchen.</div></div>
+        <div class="rc"><div class="rc-name">The Laundry Room</div><div class="rc-type">Text (702) 701-1466 to reserve · Max 4 guests</div><div class="rc-desc">True speakeasy through a literal laundromat inside Commonwealth. Bespoke cocktails, no menu.</div></div>
+        <div class="rc"><div class="rc-name">1923 Prohibition Bar — Venetian</div><div class="rc-type">Walk-in · Steps from Sphere & Wynn</div><div class="rc-desc">New Orleans-style speakeasy, live music and burlesque on weekends — convenient given the Sphere show.</div></div>
+        <div class="rc"><div class="rc-name">Here Kitty Kitty Vice Den ⭐</div><div class="rc-type">Resorts World · Near Wynn AND steps from Sphere</div><div class="rc-desc">Hidden behind a bookcase inside Ms. Meow's Mamak Stall — Prohibition-era cocktails, Singaporean twist.</div></div>
+        <div class="rc"><div class="rc-name">The Underground at The Mob Museum</div><div class="rc-type">Password changes weekly</div><div class="rc-desc">Genuine 1920s-style speakeasy hidden behind a bookcase — check @theundergroundlv for the weekly password.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-notes">
+      <div class="sec"><div class="sh"><div class="st">📝 Notes & To-Dos</div></div>
+        <div class="rc"><div class="rc-name">☐ Pick the night</div><div class="rc-desc">Fri Nov 13 or Sat Nov 14 Eagles show — locks in everything else</div></div>
+        <div class="rc"><div class="rc-name">☐ Buy Eagles tickets</div><div class="rc-desc">Ticketmaster/Eagles.com, ~$175+ starting price</div></div>
+        <div class="rc"><div class="rc-name">☐ Search United saver awards</div><div class="rc-desc">IAD/DCA/BWI → LAS, round-trip, around the chosen weekend</div></div>
+        <div class="rc"><div class="rc-name">☐ Request PlusPoints upgrade</div><div class="rc-desc">After booking the saver award — Eric has 340 banked</div></div>
+        <div class="rc"><div class="rc-name">☐ Decide on hotel</div><div class="rc-desc">Wynn again, or somewhere new</div></div>
+        <div class="rc"><div class="rc-name">☐ Book Absinthe</div><div class="rc-desc">For whichever night isn't the Eagles show</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="ev-resources">
+      <div class="sec"><div class="sh"><div class="st">🔗 Resources</div></div>
+        <a class="res-item" href="https://www.thespherevegas.com" target="_blank"><div class="res-icon">🌐</div><div><div class="res-name">Sphere Las Vegas</div><div class="res-desc">Show info, FAQs, venue guide</div></div><div class="res-arrow">↗</div></a>
+        <a class="res-item" href="https://www.united.com" target="_blank"><div class="res-icon">✈️</div><div><div class="res-name">United MileagePlus</div><div class="res-desc">Search saver awards & PlusPoints upgrades</div></div><div class="res-arrow">↗</div></a>
+        <div class="tip-box"><div class="tip-lbl">📞 Your Travel Advisor</div><div class="tip-txt">Christina Bart, Creative Escapes — <strong>770-403-9720</strong> · christina@creative-escapes.net. Loop her in if you'd rather book the hotel as a package than piecemeal.</div></div>
+      </div>
+    </div>
+  </div><!-- /vegas2 -->
 
   <!-- ALASKA -->
   <div id="trip-alaska" style="display:none">
@@ -2515,7 +2624,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 function switchTrip(t){
-  ['vegas','alaska','danube','past'].forEach(x=>{
+  ['vegas','vegas2','alaska','danube','past'].forEach(x=>{
     document.getElementById('trip-'+x).style.display=x===t?'':'none';
     document.getElementById('pill-'+x)?.classList.toggle('on',x===t);
   });
@@ -2529,6 +2638,7 @@ function jumpToPort(portSlug){
   akP('port-'+portSlug, btn);
 }
 function lvP(id,btn){sP('lv',id,btn,'vegas');}
+function evP(id,btn){sP('ev',id,btn,'vegas2');}
 function dnP(id,btn){sP('dn',id,btn,'danube');}
 function selDnTP(tab){
   ['pre','post','both'].forEach(function(t){
@@ -2604,7 +2714,7 @@ function openAddOutfit(trip){
 }
 function updateCDs(){
   const now=new Date();
-  [{p:'lv',t:new Date('2026-07-08T08:15:00-04:00')},{p:'ak',t:new Date('2026-08-14T16:00:00-07:00')},{p:'dn',t:new Date('2027-08-19T00:00:00+02:00')}].forEach(function(o){
+  [{p:'lv',t:new Date('2026-07-08T08:15:00-04:00')},{p:'ak',t:new Date('2026-08-14T16:00:00-07:00')},{p:'dn',t:new Date('2027-08-19T00:00:00+02:00')},{p:'ev',t:new Date('2026-11-13T00:00:00-08:00')}].forEach(function(o){
     var diff=o.t-now;if(diff<=0)return;
     var d=document.getElementById(o.p+'-d'),h=document.getElementById(o.p+'-h'),m=document.getElementById(o.p+'-m');
     if(d)d.textContent=Math.floor(diff/86400000);
