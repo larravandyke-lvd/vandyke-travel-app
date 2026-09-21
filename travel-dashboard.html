@@ -461,6 +461,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
     <div class="tp" id="pill-alaska" data-end="2026-08-21" onclick="switchTrip('alaska')">🚢 Alaska · Aug 2026</div>
     <div class="tp" id="pill-vegas2" data-end="2026-11-16" onclick="switchTrip('vegas2')">🦅 Vegas · Nov 2026</div>
     <div class="tp" id="pill-danube" data-end="2027-08-26" onclick="switchTrip('danube')">🏰 River Cruise · Aug 2027</div>
+    <div class="tp" id="pill-justin" onclick="switchTrip('justin')">⛵ Cruise w/Justin · Date TBD</div>
     <div class="tp past-pill" id="pill-past" onclick="switchTrip('past')">📦 Past Trips</div>
     <div class="tp" style="background:var(--acb);border-color:var(--b);color:var(--ac)" onclick="openPortalsPanel()">🔗 Portals</div>
   </div>
@@ -2763,6 +2764,62 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
     </div>
   </div><!-- /danube -->
 
+  <!-- CRUISE W/JUSTIN -->
+  <div id="trip-justin" style="display:none">
+    <div class="hero">
+      <div class="h-eye">Celebrity Ascent · Crew: Justin</div>
+      <div class="h-name">Cruise w/Justin <span>⛵ Date TBD</span></div>
+      <div class="h-sub">Deciding between a Caribbean sailing (before Justin's Feb 2027 leave) or a Europe sailing (May–Oct 2027)</div>
+      <div class="htags">
+        <div class="htag">🌴 Caribbean: now through ~Feb 2027</div>
+        <div class="htag">🌍 Europe: May–Oct 2027, round-trip Civitavecchia (Rome)</div>
+        <div class="htag">✦ No sailing booked yet — this trip is a decision tool</div>
+      </div>
+    </div>
+    <div class="nav" id="cj-nav">
+      <div class="nb on" onclick="cjP('itinerary',this)"><div class="nb-i">🗺</div><div class="nb-l">Itinerary Options</div></div>
+      <div class="nb" onclick="cjP('contact',this)"><div class="nb-i">📇</div><div class="nb-l">Justin's Info</div></div>
+      <div class="nb" onclick="cjP('questions',this)"><div class="nb-i">❓</div><div class="nb-l">Questions</div></div>
+    </div>
+
+    <div class="panel on" id="cj-itinerary">
+      <div class="sec"><div class="sh"><div class="st">🌴 Caribbean options — 10-night Ultimate Southern Caribbean, round-trip Fort Lauderdale</div></div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Nov 13, 2026</b> → back Nov 23</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Dec 4, 2026</b> → back Dec 14</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Dec 14, 2026</b> → back Dec 24</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Jan 15, 2027</b> → back Jan 25 <span style="color:var(--ac);font-weight:700">· last one before Justin's Feb leave</span></div>
+        <div class="card" style="padding:12px;margin-bottom:8px;opacity:.6"><b>Feb 26, 2027</b> → back Mar 8 <span style="color:var(--tm)">· Justin may already be home by then — confirm first</span></div>
+      </div>
+      <div class="sec"><div class="sh"><div class="st">🌍 Europe options — round-trip Civitavecchia (Rome)</div></div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>May 3, 2027</b> · 11 nights · Greece / Italy / Malta</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>May 14, 2027</b> · 10 nights · Italy / Greece / Croatia</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Jun 4, 2027</b> · 10 nights · Italy / Greece / Croatia</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Jun 25, 2027</b> · 10 nights · Italy / Greece / Croatia</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Jul 16, 2027</b> · 10 nights · Italy / Greece / Croatia</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Jul 26, 2027</b> · 11 nights · Italy / Spain — Solar Eclipse sailing</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Aug 6, 2027</b> · 10 nights · Italy / Greece / Croatia</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Sep 13, 2027</b> · 10 nights · Italy / Greece / Croatia / Montenegro</div>
+        <div class="card" style="padding:12px;margin-bottom:8px"><b>Oct 18, 2027</b> · 11 nights · Greece / Italy</div>
+      </div>
+      <div class="sec" style="font-size:11px;color:var(--tm);padding:6px 2px">Dates pulled from cruise-line schedules as of Sep 2026 — confirm exact sailing and Justin's onboard dates before booking anything.</div>
+    </div>
+
+    <div class="panel" id="cj-contact">
+      <div class="sec"><div class="card" style="padding:14px">
+        <div style="font-weight:700;margin-bottom:6px">Justin</div>
+        <div style="font-size:13px;margin-bottom:4px">Email: jayjaysteyl@gmail.com</div>
+        <div style="font-size:13px;margin-bottom:4px">Ship: Celebrity Ascent</div>
+        <div style="font-size:13px;margin-bottom:4px">Caribbean assignment through ~April 2027, then repositions to Europe</div>
+        <div style="font-size:13px">Planning to return home ~mid-to-end February 2027 for personal leave (requested a longer vacation — not yet confirmed)</div>
+      </div></div>
+    </div>
+
+    <div class="panel" id="cj-questions">
+      <div class="sec"><div class="sh"><div class="st">❓ Open Questions</div><button class="sa" onclick="openAddQuestion('cj')">+ Add</button></div>
+      <div id="cj-questions-list"></div></div>
+    </div>
+  </div><!-- /justin -->
+
   <!-- PAST TRIPS -->
   <div id="trip-past" style="display:none">
     <div class="hero">
@@ -2803,7 +2860,7 @@ body.past{background:#f8fafc;color:#1e293b;--ac:#64748b;--acl:#94a3b8;--acb:#f1f
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 function switchTrip(t){
-  ['vegas','vegas2','alaska','danube','past'].forEach(x=>{
+  ['vegas','vegas2','alaska','danube','justin','past'].forEach(x=>{
     document.getElementById('trip-'+x).style.display=x===t?'':'none';
     document.getElementById('pill-'+x)?.classList.toggle('on',x===t);
   });
@@ -2819,6 +2876,7 @@ function jumpToPort(portSlug){
 function lvP(id,btn){sP('lv',id,btn,'vegas');}
 function evP(id,btn){sP('ev',id,btn,'vegas2');}
 function dnP(id,btn){sP('dn',id,btn,'danube');}
+function cjP(id,btn){sP('cj',id,btn,'justin');}
 function selDnTP(tab){
   ['pre','post','both'].forEach(function(t){
     var p=document.getElementById('dntp-'+t), b=document.getElementById('dntp-btn-'+t);
@@ -2855,7 +2913,7 @@ function tP(el,trip){
   el.querySelector('.pkt').classList.toggle('done');
   var isDone = el.querySelector('.pkc').classList.contains('done');
   lvdSet(pkKeyFor(el, trip), isDone);
-  const tripMap={ak:'alaska',lv:'vegas',dn:'danube',ev:'vegas2'};
+  const tripMap={ak:'alaska',lv:'vegas',dn:'danube',ev:'vegas2',cj:'justin'};
   const sec=document.getElementById('trip-'+(tripMap[trip]||trip));
   if(!sec)return;
   const all=sec.querySelectorAll('.pkc'),done=sec.querySelectorAll('.pkc.done');
@@ -3071,7 +3129,7 @@ function fbRefreshAllSyncedUI() {
   try { renderFightCard(); } catch (e) {}
   try { renderPointsTracker(); } catch (e) {}
   try { renderPointsTodos(); } catch (e) {}
-  try { renderQuestions('dn'); } catch (e) {}
+  try { renderQuestions('dn'); renderQuestions('cj'); } catch (e) {}
   try {
     ['lv', 'ak', 'dn'].forEach(function (trip) {
       renderUnifiedDining(trip);
@@ -3107,7 +3165,7 @@ function restorePackingState() {
       pkt.classList.toggle('done', !!val);
     }
   });
-  var tripMap = { ak: 'alaska', lv: 'vegas', dn: 'danube', ev: 'vegas2' };
+  var tripMap = { ak: 'alaska', lv: 'vegas', dn: 'danube', ev: 'vegas2', cj: 'justin' };
   ['ak', 'lv', 'dn', 'ev'].forEach(function (trip) {
     var sec = document.getElementById('trip-' + tripMap[trip]);
     if (!sec) return;
@@ -6453,7 +6511,7 @@ function deleteM(){
     var tripId=pkSec?pkSec.id.split('-')[0]:null;
     mTarget.remove();
     if(tripId){
-      var tripMap={ak:'alaska',lv:'vegas',dn:'danube',ev:'vegas2'};
+      var tripMap={ak:'alaska',lv:'vegas',dn:'danube',ev:'vegas2',cj:'justin'};
       var sec=document.getElementById('trip-'+(tripMap[tripId]||tripId));
       if(sec){
         var all=sec.querySelectorAll('.pkc'),done=sec.querySelectorAll('.pkc.done');
