@@ -372,6 +372,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
 .mf input[type=file]{padding:7px;font-size:11px}
 /* vegas2 is a dark theme but the modal card stays white - give it readable dark-on-light text */
 body.vegas2 .modal{--text:#1a0533;--ts:#5b3a8a;--tm:#6b5b95;--b:#c4b5fd;--ac:#6c3aed;color:#1a0533}
+body.vegas2 .pt-bal{color:var(--pcl)!important}
+body.vegas2 .pt-row{border-left-color:var(--pcl)!important}
 body.vegas2 .mf input::placeholder,body.vegas2 .mf textarea::placeholder{color:#8b7fb0}
 .mbtns{display:flex;gap:8px;margin-top:14px}
 .msave{flex:1;background:var(--hb);color:white;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
@@ -4743,11 +4745,11 @@ var FIGHT_CARD = {"event": "UFC 329 · McGregor vs. Holloway 2", "date": "Saturd
 
 // ── POINTS BALANCE TRACKER ──
 var POINTS_PROGRAMS = [
-  {key: 'united', label: 'United MileagePlus', icon: '🔵', color: '#003876'},
-  {key: 'royalone', label: 'Royal ONE (Bank of America)', icon: '🟣', color: '#4c1d95'},
-  {key: 'amex', label: 'Amex Membership Rewards', icon: '💳', color: '#b76e79'},
-  {key: 'chase', label: 'Chase Ultimate Rewards', icon: '🟦', color: '#0a2f6b'},
-  {key: 'citi', label: 'Citi ThankYou Points', icon: '💳', color: '#0066b3'}
+  {key: 'united', label: 'United MileagePlus', icon: '🔵', color: '#003876', light: '#7db4ff'},
+  {key: 'royalone', label: 'Royal ONE (Bank of America)', icon: '🟣', color: '#4c1d95', light: '#c9adff'},
+  {key: 'amex', label: 'Amex Membership Rewards', icon: '💳', color: '#b76e79', light: '#f0aab5'},
+  {key: 'chase', label: 'Chase Ultimate Rewards', icon: '🟦', color: '#0a2f6b', light: '#8fb8ff'},
+  {key: 'citi', label: 'Citi ThankYou Points', icon: '💳', color: '#0066b3', light: '#7cc0ff'}
 ];
 // ── POINTS STRATEGY NOTES & TO-DOS ──
 function renderPointsTodos() {
@@ -4798,7 +4800,7 @@ function renderPointsTracker() {
     var data = lvdGet('lvd_data_points_' + p.key, null);
     var bal = data && data.balance ? Number(data.balance).toLocaleString() : 'Tap to add';
     var updated = data && data.updated ? '<div style="font-size:10px;color:var(--tm);margin-top:2px">Updated ' + data.updated + '</div>' : '';
-    return '<div class="rc" style="cursor:pointer;padding:12px 14px;border-left:4px solid ' + p.color + '" onclick="openPointsEdit(\'' + p.key + '\')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:700">' + p.icon + ' ' + p.label + '</div>' + updated + '</div><div style="font-size:16px;font-weight:800;color:' + p.color + '">' + bal + '</div></div></div>';
+    return '<div class="rc pt-row" style="cursor:pointer;padding:12px 14px;border-left:4px solid ' + p.color + ';--pcl:' + p.light + '" onclick="openPointsEdit(\'' + p.key + '\')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:700">' + p.icon + ' ' + p.label + '</div>' + updated + '</div><div class="pt-bal" style="font-size:16px;font-weight:800;color:' + p.color + '">' + bal + '</div></div></div>';
   }).join('');
   wraps.forEach(function(w){ w.innerHTML = html; });
 }
